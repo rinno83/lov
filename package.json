@@ -1,0 +1,33 @@
+{
+  "name": "League_Of_Village",
+  "description": "League Of Village API Server : http://54.178.134.74/",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "lodash": "2.4.1",
+    "when": "2.7.0",
+    "express": "4.1.1",
+    "morgan": "1.0.0",
+    "body-parser": "1.0.2",
+    "method-override": "1.0.0",
+    "hiredis": "0.1.16",
+    "redis": "0.10.1",
+    "querystring": "0.2.0",
+    "crypto": "0.0.3",
+    "mysql": "2.2.0",
+    "numeral": "1.5.3",
+    "requestify" : "0.1.16",
+    "winston": "0.7.3",
+    "mongodb": "1.4.5",
+    "methods": "1.0.1",
+    "pkginfo": "0.3.0",
+    "cycle": "1.0.3",
+    "colors": "0.6.2",
+    "stack-trace": "0.0.9",
+    "async": "0.9.0",
+    "raw-body": "1.1.6",
+    "type-is": "1.2.1",
+    "qs": "0.6.6",
+    "dateformat": "1.0.8-1.2.3"
+  }
+}
