@@ -14,94 +14,29 @@ var when				= require('when'),
 	member;
 	
 
-function get_device_key(sid, device, uuid)
+function get_member_token_key(device, token)
 {
-	return key_string = "DEVICE::"+sid+"::"+device+"::"+uuid;
-	//return new Buffer(key_string).toString('base64');
+	return key_string = "TOKEN::"+device+"::"+token;
 }
-
-function get_member_token_key(sid, device, token)
-{
-	return key_string = "TOKEN::"+sid+"::"+device+"::"+token;
-}
-
-function get_reg_token_key(sid, token)
-{
-	return key_string = "REGIST::"+sid+"::"+token;
-}
-
 
 member = {
 
-	/**
-	* @api {post} /regist/direct Regist Direct
-	* @apiName Regist Direct
-	* @apiGroup xenixstudio API
-	*
-	* @apiParam {String} service_key Service Key [Header].
-	* @apiParam {String} Accesstoken Member Token [Header, Optional].
-	* @apiParam {Int} level Regist Level.
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS Name.
-	* @apiParam {String} push_token Member Device Push Token [Optional].
-	*
-	* @apiSuccess {int} result Result code.
-	* @apiSuccess {String} resultmessage  Result Message.
-	* @apiSuccess {Object[]} data  Result Data.
-	* @apiSuccess {String} data.token  Member Token.
-	* @apiSuccess {String} data.level  Next Regist Level.
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "result": 1,
-	*	     "resultmessage": "성공",
-	*	     "data": {
-	*	        "token": "ooISUBM4nKJ3lACs5D4l17V2SBrj2/KjSWdv9j5rh8I=",
-	*	        "level": 2
-	*	     }
-	*	  }
-	*
-	* @apiErrorExample DB Error-Response:
-	*     HTTP/1.1 200 DB Error
-	*     {
-	*        "result": 100,
-	*	     "resultmessage": "디비 오류",
-	*	     "type": "DatabaseError"
-	*     }
-	* @apiErrorExample Parameter Error-Response:
-	*     HTTP/1.1 200 Parameter Error
-	*     {
-	*        "result": 101,
-	*	     "resultmessage": "파라미터 오류",
-	*	     "type": "BadParameterError"
-	*     }
-	* @apiErrorExample NotFound Error-Response:
-	*     HTTP/1.1 200 NotFound Error
-	*     {
-	*        "result": 102,
-	*	     "resultmessage": "존재하지 않는 회원 입니다",
-	*	     "type": "NotFoundUserError"
-	*     }
-	* @apiError (Exception 하단 참고) 100 디비 오류.
-	* @apiError (Exception 하단 참고) 101 파라미터 오류.
-	* @apiError (Exception 하단 참고) 102 존재하지 않는 회원 입니다.
-	*/
-	regist_direct: function regist_direct(response, body, options) {
+	social: function social(response, body, options) {
 		
 		//console.log('login');
 		var resData = {};
 		
-		if(body.level != null && body.uuid != null && body.device != null)
+		if(body.socialId != null && body.nickname != null && body.uuid != null && body.device != null)
 		{
-			sid = options.sid;
+			socialId = body.socialId;
+			nick = body.nickname;
+			profileImageUrl = (body.profileImageUrl == undefined)?'':body.profileImageUrl;
 			
-			reg_level = body.level;
 			uuid = body.uuid;
 			device = body.device;
-			push_token = (body.push_token == undefined)?null:body.push_token;
+			pushToken = (body.pushToken == undefined)?'':body.pushToken;
 			
-			mysql_manager.set_member_direct(sid, function(err, data){
+			mysql_manager.insertMember(socialId, nick, profileImageUrl, uuid, device, pushToken, function(err, data){
 				if(err)
 				{
 					exception.throwError(new exception.DatabaseError());
@@ -110,70 +45,45 @@ member = {
 				{
 					var dbData = JSON.parse(data);
 					
-					if(dbData[0].result_code == 1)
+					if(dbData[0].result == 1)
 					{
 						// Set Member Device in Mysql
-						mysql_manager.set_member_device(sid, dbData[0].xid, device, uuid, push_token);
+						mysql_manager.setMemberDevice(dbData[0].memberIndex, uuid, device, pushToken);
+						
+						var member_token = token_manager.make_member_token(dbData[0].memberIndex, device, uuid);
+						console.log('member_token : ' + member_token);
 						
 						// Set Member Token in Redis
-						var redis_key = get_device_key(sid, device, uuid);
+						var redis_key = get_member_token_key(device, member_token);
 						
 						var redis_instance = new redis_manager(config().redis);
-						redis_instance.set(redis_key, dbData[0].xid, function(err, reply){});
-					
-						// Set Regist Level
-						var save_level = reg_level - 1;
-						mysql_manager.set_service_member_level(sid, dbData[0].xid, save_level);
+						redis_instance.set(redis_key, dbData[0].memberIndex, function(err, reply){});
 						
-						if(save_level == 0)
-						{
-							var member_token = token_manager.make_member_token(sid, dbData[0].xid, device, uuid);
-							console.log('member_token : ' + member_token);
-							
-							// Set Member Token in Redis
-							var redis_key = get_member_token_key(sid, device, member_token);
-							
-							var redis_instance = new redis_manager(config().redis);
-							redis_instance.set(redis_key, dbData[0].xid, function(err, reply){});
-							
-							
-							// Response
-							var resArray = {
-								'token':member_token,
-								'level':save_level
-							};
-							resData.result = 1;
-							resData.resultmessage = '성공';
-							resData.data = resArray;
-							
-							response.json(200, resData);
-						}
-						else
-						{
-							var reg_token = token_manager.make_reg_token(sid, dbData[0].xid);
-							console.log('reg_token : ' + reg_token);
-							
-							// Set Member Token in Redis
-							var redis_key = get_reg_token_key(sid, reg_token);
-							
-							var redis_instance = new redis_manager(config().redis);
-							redis_instance.set(redis_key, dbData[0].xid, function(err, reply){});
-							
-							// Response
-							var resArray = {
-								'token':reg_token,
-								'level':save_level
-							};
-							resData.result = 1;
-							resData.resultmessage = '성공';
-							resData.data = resArray;
-							
-							response.json(200, resData);
-						}
+						
+						// Response
+						var resArray = {
+							'token':member_token
+						};
+						resData.resultmessage = '가입 성공';
+						resData.data = resArray;
+						
+						response.json(200, resData);						
+					}
+					else if(dbData[0].result == 2)
+					{
+						var resArray = dbData[0];
+						
+						resData.resultmessage = '로그인 성공';
+						resData.data = resArray;
+						
+						response.json(200, resData);
 					}
 					else
 					{
-						exception.throwError(new exception.DatabaseError());
+						resData.result = '01';
+						resData.resultmessage = 'DB 오류';
+						
+						response.json(500, resData);
 					}
 					
 					
@@ -181,698 +91,133 @@ member = {
 			});
 		}
 		else {
-			exception.throwError(new exception.BadParameterError());
+			resData.result = '02';
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
+	},
+	
+	token: function token(response, body, options) {
+		
+		//console.log('login');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null)
+		{
+			resData.resultCode = 1;
+			resData.resultmessage = '성공';
+			
+			response.json(200, resData);
+		}
+		else {
+			resData.result = '02';
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
+	},
+	
+	friend_sync: function friend_sync(response, body, options) {
+		
+		//console.log('login');
+		var resData = {};
+		console.log(body);
+		
+		if(body.token != null && body.uuid != null && body.device != null && body.friends != null)
+		{
+			resData.resultCode = 1;
+			resData.resultmessage = '성공';
+			
+			response.json(200, resData);
+		}
+		else {
+			resData.result = '02';
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
 		}
 		
 	},
 	
 	
-	
-	
-	/**
-	* @api {post} /token/check Member Token Check
-	* @apiName Member Token Check
-	* @apiGroup xenixstudio API
-	*
-	* @apiParam {String} service_key Service Key [Header].
-	* @apiParam {String} Accesstoken Member Token [Header, Optional].
-	* @apiParam {String} reg_token Regist Token [Optional].
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS Name.
-	*
-	* @apiSuccess {int} result Result code.
-	* @apiSuccess {String} resultmessage  Result Message.
-	* @apiSuccess {Object[]} data  Result Data.
-	* @apiSuccess {String} data.token  Member Token.
-	* @apiSuccess {String} data.level  Next Regist Level.
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "result": 1,
-	*	     "resultmessage": "성공",
-	*	     "data": {
-	*	        "token": "ooISUBM4nKJ3lACs5D4l17V2SBrj2/KjSWdv9j5rh8I=",
-	*	        "level": 2
-	*	     }
-	*	  }
-	*
-	* @apiErrorExample DB Error-Response:
-	*     HTTP/1.1 200 DB Error
-	*     {
-	*        "result": 100,
-	*	     "resultmessage": "디비 오류",
-	*	     "type": "DatabaseError"
-	*     }
-	* @apiErrorExample Parameter Error-Response:
-	*     HTTP/1.1 200 Parameter Error
-	*     {
-	*        "result": 101,
-	*	     "resultmessage": "파라미터 오류",
-	*	     "type": "BadParameterError"
-	*     }
-	* @apiErrorExample NotFound Error-Response:
-	*     HTTP/1.1 200 NotFound Error
-	*     {
-	*        "result": 102,
-	*	     "resultmessage": "존재하지 않는 회원 입니다",
-	*	     "type": "NotFoundUserError"
-	*     }
-	* @apiError (Exception 하단 참고) 100 디비 오류.
-	* @apiError (Exception 하단 참고) 101 파라미터 오류.
-	* @apiError (Exception 하단 참고) 102 존재하지 않는 회원 입니다.
-	*/
-	token_check: function token_check(response, body, options) {
+	info: function info(response, body, options) {
+		
+		//console.log('login');
 		var resData = {};
 		
-		if(body.uuid != null && body.device != null)
+		if(body.token != null && body.uuid != null && body.device != null)
 		{
-			sid = options.sid;
-			member_token = options.token;
+			var resArray = {
+				'nickname':'doogoon',
+				'profileImageUrl':'http://image.tvdaily.co.kr/upimages/gisaimg/201203/1330754784_281586.jpg',
+				'teamName':'blue',
+				'teamImageUrl':'http://rlv.zcache.com/team_blue_polka_dot_stars_round_sticker-p217941021613239303en8ct_265.jpg'
+			};
+			resData.resultCode = 1;
+			resData.resultmessage = '성공';
+			resData.data = resArray;
 			
-			reg_token = body.reg_token;
-			uuid = body.uuid;
-			device = body.device;
-						
-			if(member_token == undefined && reg_token == undefined)
-			{
-				// 가입은 되어있지만 토큰을 잊어버렸을 때(앱을 지웠다 설치했을 경우)
-				var redis_key = get_device_key(sid, device, uuid);
-				var redis_instance = new redis_manager(config().redis);
-				redis_instance.get(redis_key, function(err, data){
-					if(err)
-					{
-						exception.throwError(new exception.DatabaseError());
-					}
-					else
-					{
-						mysql_manager.get_member_regist_level(sid, data, function(err, data2){
-							if(err)
-							{
-								resData.result = 100;
-								resData.resultmessage = '디비 오류.';
-								response.json(200, resData);
-							}
-							else
-							{
-								var dbData = JSON.parse(data2);
-								console.log(dbData);
-								
-								var member_level = dbData[0].reg_level;
-								
-								var member_token = token_manager.make_member_token(sid, data, device, uuid);
-								console.log('member_token : ' + member_token);
-								
-								// Set Member Token in Redis
-								var redis_key = get_member_token_key(sid, device, member_token);
-								
-								var redis_instance = new redis_manager(config().redis);
-								redis_instance.set(redis_key, data, function(err, reply){});
-								
-								
-								// Response
-								var resArray = {
-									'token':member_token,
-									'level':member_level
-								};
-								resData.result = 1;
-								resData.resultmessage = '성공';
-								resData.data = resArray;
-								
-								response.json(200, resData);
-							}
-						});
-					}
-				});
-			}
-			else
-			{
-				// Regist incomplete
-				if(member_token == undefined)
-				{
-					// Set Member Token in Redis
-					var redis_key = get_reg_token_key(sid, reg_token);
-					
-					var redis_instance = new redis_manager(config().redis);
-					redis_instance.get(redis_key, function(err, reply){
-						if(err)
-						{
-							exception.throwError(new exception.DatabaseError());
-						}
-						else
-						{
-							if(reply == null)
-							{
-								resData.result = 102;
-								resData.resultmessage = '존재하지 않는 회원 입니다.';
-								response.json(200, resData);
-							}
-							else
-							{
-								mysql_manager.get_member_regist_level(sid, reply, function(err, data){
-									if(err)
-									{
-										resData.result = 100;
-										resData.resultmessage = '디비 오류.';
-										response.json(200, resData);
-									}
-									else
-									{
-										var dbData = JSON.parse(data);
-										
-										var member_level = dbData[0].reg_level;
-										
-										// Response
-										var resArray = {
-											'token':reg_token,
-											'level':member_level
-										};
-										resData.result = 1;
-										resData.resultmessage = '성공';
-										resData.data = resArray;
-										
-										response.json(200, resData);
-									}
-								});
-							}							
-						}
-					});
-				}
-				else // Regist complete
-				{
-					// Set Member Token in Redis
-					var redis_key = get_member_token_key(sid, device, member_token);
-					
-					var redis_instance = new redis_manager(config().redis);
-					redis_instance.get(redis_key, function(err, reply){
-						if(err)
-						{
-							exception.throwError(new exception.DatabaseError());
-						}
-						else
-						{
-							if(reply == null)
-							{
-								resData.result = 102;
-								resData.resultmessage = '존재하지 않는 회원 입니다.';
-								response.json(200, resData);
-							}
-							else
-							{
-								mysql_manager.get_member_regist_level(sid, reply, function(err, data){
-									if(err)
-									{
-										resData.result = 100;
-										resData.resultmessage = '디비 오류.';
-										response.json(200, resData);
-									}
-									else
-									{
-										var dbData = JSON.parse(data);
-										
-										var member_level = dbData[0].reg_level;
-										
-										// Response
-										var resArray = {
-											'token':member_token,
-											'level':member_level
-										};
-										resData.result = 1;
-										resData.resultmessage = '성공';
-										resData.data = resArray;
-										
-										response.json(200, resData);
-									}
-								});
-							}							
-						}
-					});
-				}	
-			}
+			response.json(200, resData);
 		}
 		else {
-			exception.throwError(new exception.BadParameterError());
+			resData.result = '02';
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
 		}
 		
 	},
 	
 	
-	
-	/**
-	* @api {post} /regist/info/direct Member Regist Info
-	* @apiName Member Regist Info
-	* @apiGroup xenixstudio API
-	*
-	* @apiParam {String} service_key Service Key [Header].
-	* @apiParam {String} Accesstoken Member Token [Header, Optional].
-	* @apiParam {String} reg_token Regist Token [Optional].
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS Name.
-	* @apiParam {Int} level Member Regist Level.
-	* @apiParam {String} info Member info [Encryption].
-	*
-	* @apiSuccess {int} result Result code.
-	* @apiSuccess {String} resultmessage  Result Message.
-	* @apiSuccess {Object[]} data  Result Data.
-	* @apiSuccess {String} data.token  Member Token.
-	* @apiSuccess {String} data.level  Next Regist Level.
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "result": 1,
-	*	     "resultmessage": "성공",
-	*	     "data": {
-	*	        "token": "ooISUBM4nKJ3lACs5D4l17V2SBrj2/KjSWdv9j5rh8I=",
-	*	        "level": 2
-	*	     }
-	*	  }
-	*
-	* @apiErrorExample DB Error-Response:
-	*     HTTP/1.1 200 DB Error
-	*     {
-	*        "result": 100,
-	*	     "resultmessage": "디비 오류",
-	*	     "type": "DatabaseError"
-	*     }
-	* @apiErrorExample Parameter Error-Response:
-	*     HTTP/1.1 200 Parameter Error
-	*     {
-	*        "result": 101,
-	*	     "resultmessage": "파라미터 오류",
-	*	     "type": "BadParameterError"
-	*     }
-	* @apiErrorExample NotFound Error-Response:
-	*     HTTP/1.1 200 NotFound Error
-	*     {
-	*        "result": 102,
-	*	     "resultmessage": "존재하지 않는 회원 입니다",
-	*	     "type": "NotFoundUserError"
-	*     }
-	* @apiError (Exception 하단 참고) 100 디비 오류.
-	* @apiError (Exception 하단 참고) 101 파라미터 오류.
-	* @apiError (Exception 하단 참고) 102 존재하지 않는 회원 입니다.
-	*/
-	regist_info_direct: function regist_info_direct(response, body, options) {
+	info_update: function info_update(response, body, options) {
+		
+		//console.log('login');
 		var resData = {};
 		
-		if(body.reg_token != null && body.level != null && body.uuid != null && body.device != null && body.info != null)
+		if(body.token != null && body.uuid != null && body.device != null)
 		{
-			sid = options.sid;
-			skey = options.skey;
+			var resArray = {
+				'nickname':'doogoon',
+				'profileImageUrl':'http://image.tvdaily.co.kr/upimages/gisaimg/201203/1330754784_281586.jpg',
+				'teamName':'blue',
+				'teamImageUrl':'http://rlv.zcache.com/team_blue_polka_dot_stars_round_sticker-p217941021613239303en8ct_265.jpg'
+			};
+			resData.resultCode = 1;
+			resData.resultmessage = '성공';
+			resData.data = resArray;
 			
-			reg_token = body.reg_token;
-			uuid = body.uuid;
-			device = body.device;
-			reg_level = body.level;
-			info = body.info;
-			
-			var redis_key = get_reg_token_key(sid, reg_token);
-					
-			var redis_instance = new redis_manager(config().redis);
-			redis_instance.get(redis_key, function(err, reply){
-				if(err)
-				{
-					exception.throwError(new exception.DatabaseError());
-				}
-				else
-				{
-					if(reply == null)
-					{
-						resData.result = 102;
-						resData.resultmessage = '존재하지 않는 회원 입니다.';
-						response.json(200, resData);
-					}
-					else
-					{
-						var xid = reply;
-						var collection = 'xenix_'+skey+'_info';
-						
-						mongodb_manager.set_member_info(collection, xid, info);	
-					
-					
-						// Set Regist Level
-						var save_level = reg_level - 1;
-						mysql_manager.set_service_member_level(sid, reply, save_level);
-						
-						if(save_level == 0)
-						{
-							var member_token = token_manager.make_member_token(sid, reply, device, uuid);
-							console.log('member_token : ' + member_token);
-							
-							// Set Member Token in Redis
-							var redis_key = get_member_token_key(sid, device, member_token);
-							
-							var redis_instance = new redis_manager(config().redis);
-							redis_instance.set(redis_key, reply, function(err, reply){});
-							
-							
-							// Response
-							var resArray = {
-								'token':member_token,
-								'level':save_level
-							};
-							resData.result = 1;
-							resData.resultmessage = '성공';
-							resData.data = resArray;
-							
-							response.json(200, resData);
-						}
-						else
-						{
-							// Response
-							var resArray = {
-								'token':reg_token,
-								'level':save_level
-							};
-							resData.result = 1;
-							resData.resultmessage = '성공';
-							resData.data = resArray;
-							
-							response.json(200, resData);
-						}
-					}
-				}
-			});
-			
+			response.json(200, resData);
 		}
 		else {
-			exception.throwError(new exception.BadParameterError());
+			resData.result = '02';
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
 		}
 		
 	},
 	
 	
-	
-	/**
-	* @api {post} /regist/device/direct Member Regist Device
-	* @apiName Member Regist Device
-	* @apiGroup xenixstudio API
-	*
-	* @apiParam {String} service_key Service Key [Header].
-	* @apiParam {String} Accesstoken Member Token [Header].
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS Name.
-	* @apiParam {String} push_token Member Device Push Token.
-	*
-	* @apiSuccess {int} result Result code.
-	* @apiSuccess {String} resultmessage  Result Message.
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "result": 1,
-	*	     "resultmessage": "성공"
-	*	  }
-	*
-	* @apiErrorExample DB Error-Response:
-	*     HTTP/1.1 200 DB Error
-	*     {
-	*        "result": 100,
-	*	     "resultmessage": "디비 오류",
-	*	     "type": "DatabaseError"
-	*     }
-	* @apiErrorExample Parameter Error-Response:
-	*     HTTP/1.1 200 Parameter Error
-	*     {
-	*        "result": 101,
-	*	     "resultmessage": "파라미터 오류",
-	*	     "type": "BadParameterError"
-	*     }
-	* @apiErrorExample NotFound Error-Response:
-	*     HTTP/1.1 200 NotFound Error
-	*     {
-	*        "result": 102,
-	*	     "resultmessage": "존재하지 않는 회원 입니다",
-	*	     "type": "NotFoundUserError"
-	*     }
-	* @apiError (Exception 하단 참고) 100 디비 오류.
-	* @apiError (Exception 하단 참고) 101 파라미터 오류.
-	* @apiError (Exception 하단 참고) 102 존재하지 않는 회원 입니다.
-	*/
-	regist_device_direct: function regist_device_direct(response, body, options) {
+	logout: function logout(response, body, options) {
+		
+		//console.log('login');
 		var resData = {};
 		
-		if(body.push_token != null && body.uuid != null && body.device != null)
+		if(body.token != null && body.uuid != null && body.device != null)
 		{
-			sid = options.sid;
-			token = options.token;
+			resData.resultCode = 1;
+			resData.resultmessage = '성공';
 			
-			uuid = body.uuid;
-			device = body.device;
-			push_token = body.push_token;
-			
-			var redis_key = get_member_token_key(sid, device, token);
-					
-			var redis_instance = new redis_manager(config().redis);
-			redis_instance.get(redis_key, function(err, reply){
-				if(err)
-				{
-					exception.throwError(new exception.DatabaseError());
-				}
-				else
-				{
-					if(reply == null)
-					{
-						resData.result = 102;
-						resData.resultmessage = '존재하지 않는 회원 입니다.';
-						response.json(200, resData);
-					}
-					else
-					{
-						var xid = reply;
-						mysql_manager.set_member_device(sid, xid, device, uuid, push_token);
-						
-						resData.result = 1;
-						resData.resultmessage = '성공';
-						
-						response.json(200, resData);
-					}
-				}
-			});
-			
+			response.json(200, resData);
 		}
 		else {
-			exception.throwError(new exception.BadParameterError());
-		}
-		
-	},
-	
-	
-	/**
-	* @api {post} /regist/profile Member Regist Profile Photo
-	* @apiName Member Regist Profile Photo
-	* @apiGroup xenixstudio API
-	*
-	* @apiParam {String} service_key Service Key [Header].
-	* @apiParam {String} Accesstoken Member Token [Header].
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS Name.
-	* @apiParam {String} profile_url Member Profile Photo URL.
-	* @apiParam {String} thumbnail_url Member Thumbnail Profile Photo URL.
-	*
-	* @apiSuccess {int} result Result code.
-	* @apiSuccess {String} resultmessage  Result Message.
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "result": 1,
-	*	     "resultmessage": "성공"
-	*	  }
-	*
-	* @apiErrorExample DB Error-Response:
-	*     HTTP/1.1 200 DB Error
-	*     {
-	*        "result": 100,
-	*	     "resultmessage": "디비 오류",
-	*	     "type": "DatabaseError"
-	*     }
-	* @apiErrorExample Parameter Error-Response:
-	*     HTTP/1.1 200 Parameter Error
-	*     {
-	*        "result": 101,
-	*	     "resultmessage": "파라미터 오류",
-	*	     "type": "BadParameterError"
-	*     }
-	* @apiErrorExample NotFound Error-Response:
-	*     HTTP/1.1 200 NotFound Error
-	*     {
-	*        "result": 102,
-	*	     "resultmessage": "존재하지 않는 회원 입니다",
-	*	     "type": "NotFoundUserError"
-	*     }
-	* @apiError (Exception 하단 참고) 100 디비 오류.
-	* @apiError (Exception 하단 참고) 101 파라미터 오류.
-	* @apiError (Exception 하단 참고) 102 존재하지 않는 회원 입니다.
-	*/
-	regist_profile: function regist_profile(response, body, options) {
-		var resData = {};
-		
-		if(body.profile_url != null && body.thumbnail_url != null && body.device != null)
-		{
-			sid = options.sid;
-			skey = options.skey;
-			token = options.token;
+			resData.result = '02';
+			resData.resultmessage = '파라메터 오류';
 			
-			profile_url = body.profile_url;
-			thumbnail_url = body.thumbnail_url;
-			device = body.device;
-			uuid = body.uuid;
-			
-			var redis_key = get_member_token_key(sid, device, token);
-					
-			var redis_instance = new redis_manager(config().redis);
-			redis_instance.get(redis_key, function(err, reply){
-				if(err)
-				{
-					exception.throwError(new exception.DatabaseError());
-				}
-				else
-				{
-					if(reply == null)
-					{
-						resData.result = 102;
-						resData.resultmessage = '존재하지 않는 회원 입니다.';
-						response.json(200, resData);
-					}
-					else
-					{
-						var xid = reply;
-						var collection = 'xenix_'+skey+'_profile';
-						
-						mongodb_manager.set_member_profile(collection, xid, profile_url, thumbnail_url);	
-						
-						resData.result = 1;
-						resData.resultmessage = '성공';
-						
-						response.json(200, resData);
-					}
-				}
-			});
-			
-		}
-		else {
-			exception.throwError(new exception.BadParameterError());
-		}
-		
-	},
-	
-	
-	
-	
-	/**
-	* @api {post} /member/profile Get Member Profile Photo
-	* @apiName Get Member Profile Photo
-	* @apiGroup xenixstudio API
-	*
-	* @apiParam {String} service_key Service Key [Header].
-	* @apiParam {String} Accesstoken Member Token [Header].
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS Name.
-	*
-	* @apiSuccess {int} result Result code.
-	* @apiSuccess {String} resultmessage  Result Message.
-	* @apiSuccess {Object[]} data  Result Data.
-	* @apiSuccess {String} data.profile_url  Member Profile Photo URL.
-	* @apiSuccess {String} data.thumbnail_url  Member Thumbnail Profile Photo URL.	
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	    "result": 1,
-	*	    "resultmessage": "성공",
-	*	    "data": {
-	*	        "profile_url": "http://4.bp.blogspot.com/-npZ_9DmQfHY/UuB1IO221KI/AAAAAAAACS4/Iam0nyO_DMg/s1600/1%25B9%25DA2%25C0%25CF_E442_130609_HDTV_H264_720p-WITH_mp4_002895692.jpg",
-	*	        "thumbnail_url": "http://i.imgur.com/wbiNjPv.jpg"
-	*	    }
-	*	}
-	*
-	* @apiErrorExample DB Error-Response:
-	*     HTTP/1.1 200 DB Error
-	*     {
-	*        "result": 100,
-	*	     "resultmessage": "디비 오류",
-	*	     "type": "DatabaseError"
-	*     }
-	* @apiErrorExample Parameter Error-Response:
-	*     HTTP/1.1 200 Parameter Error
-	*     {
-	*        "result": 101,
-	*	     "resultmessage": "파라미터 오류",
-	*	     "type": "BadParameterError"
-	*     }
-	* @apiErrorExample NotFound Error-Response:
-	*     HTTP/1.1 200 NotFound Error
-	*     {
-	*        "result": 102,
-	*	     "resultmessage": "존재하지 않는 회원 입니다",
-	*	     "type": "NotFoundUserError"
-	*     }
-	* @apiError (Exception 하단 참고) 100 디비 오류.
-	* @apiError (Exception 하단 참고) 101 파라미터 오류.
-	* @apiError (Exception 하단 참고) 102 존재하지 않는 회원 입니다.
-	*/
-	profile: function profile(response, body, options) {
-		var resData = {};
-		
-		if(body.device != null)
-		{
-			sid = options.sid;
-			skey = options.skey;
-			token = options.token;
-			
-			device = body.device;
-			uuid = body.uuid;
-			
-			var redis_key = get_member_token_key(sid, device, token);
-					
-			var redis_instance = new redis_manager(config().redis);
-			redis_instance.get(redis_key, function(err, reply){
-				if(err)
-				{
-					exception.throwError(new exception.DatabaseError());
-				}
-				else
-				{
-					if(reply == null)
-					{
-						resData.result = 102;
-						resData.resultmessage = '존재하지 않는 회원 입니다.';
-						response.json(200, resData);
-					}
-					else
-					{
-						var xid = reply;
-						var collection = 'xenix_'+skey+'_profile';
-						
-						mongodb_manager.get_member_profile(collection, xid, function(err, docs){
-							if(err)
-							{
-								resData.result = 100;
-								resData.resultmessage = '디비 오류.';
-								response.json(200, resData);
-							}
-							else
-							{	
-								var profile_data = {
-									'profile_url': docs[0].profile_url,
-									'thumbnail_url': docs[0].thumbnail_url
-								};
-								resData.result = 1;
-								resData.resultmessage = '성공';
-								resData.data = profile_data;
-								
-								response.json(200, resData);
-							}
-						});							
-					}
-				}
-			});
-			
-		}
-		else {
-			exception.throwError(new exception.BadParameterError());
+			response.json(400, resData);
 		}
 		
 	}

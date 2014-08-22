@@ -7,6 +7,7 @@ var _             = require('lodash'),
 	exception		= require('../core/exception/index.js'),	
 	member        = require('./member'),
 	service        = require('./service'),
+	upload        = require('./upload'),
 	mysql_manager	= require('../handler/mysql_handler'),	
 	redis_manager = require('../handler/redis_handler'),
 	winston 		= require("winston"),	
@@ -96,45 +97,18 @@ http = function (apiMethod) {
 	return function (req, res) {
 		var object = req.body,
 			options = {};	
-		
-		if( req.headers != undefined && req.headers.service_key != undefined ) 
+
+		if( req.headers != undefined && req.headers.accesstoken != undefined ) 
 		{
-			options.skey = req.headers.service_key;
-			
-			// Check Service ID
-			mysql_manager.get_service_id(req.headers.service_key, function(err, data){
-				if(err)
-				{
-					var resData = {};
-					resData.result = 100;
-					resData.resultmessage = '디비 오류.';
-					res.json(200, resData);
-				}
-				else
-				{
-					var dbData = JSON.parse(data);
-					options.sid = dbData.sid;
-					
-					// Check Access Token
-					if( object != undefined && req.headers.accesstoken != undefined ) {
-					
-						options.token = req.headers.accesstoken;
+			object.token = req.headers.accesstoken;
+			object.uuid = req.headers.uuid;
+			object.device = req.headers.device;
 						
-						loadController(apiMethod, object, res, options);
-					
-					}
-					else {
-						loadController(apiMethod, object, res, options);
-					}
-				}
-			});	
+			loadController(apiMethod, object, res, options);		
 		}
 		else
 		{
-			var resData = {};
-			resData.result = 101;
-			resData.resultmessage = '파라미터 오류.';
-			res.json(200, resData);
+			loadController(apiMethod, object, res, options);
 		}		
 	};
 };
@@ -142,5 +116,6 @@ http = function (apiMethod) {
 module.exports = {
 	http: http,
 	member: member,
-	service: service
+	service: service,
+	upload: upload
 };

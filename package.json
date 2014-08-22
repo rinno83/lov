@@ -1,6 +1,6 @@
 {
   "name": "League_Of_Village",
-  "description": "League Of Village API Server : http://54.178.134.74/",
+  "description": "League Of Village API Server : http://54.178.134.74:9001/",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
@@ -28,6 +28,9 @@
     "raw-body": "1.1.6",
     "type-is": "1.2.1",
     "qs": "0.6.6",
-    "dateformat": "1.0.8-1.2.3"
+    "dateformat": "1.0.8-1.2.3",
+    "parted": "0.1.1",
+    "multipart": "0.1.5",
+    "busboy": "0.2.8"
   }
 }

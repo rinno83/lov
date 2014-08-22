@@ -4,16 +4,16 @@ var config = require('../core/configuration/index.js')
 var pool = mysql.createPool(config().database);
 
 //connection.query('USE xenix_doogoon_db');
-exports.set_member_direct = function(sid, fn){
+exports.insertMember = function(socialId, nick, profileImageUrl, uuid, device, pushToken, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
 			throw err;
 		}
 		
-		connection.query('USE xenix_service_db', function(err, rows, fields){
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL XSP_MEMBER_REGIST_DIRECT("'+sid+'")', function(err, rows, fields) {
+			connection.query('CALL USP_INSERT_MEMBER("'+socialId+'", "'+nick+'", "'+profileImageUrl+'", "'+uuid+'", "'+device+'", "'+pushToken+'")', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		
@@ -33,16 +33,16 @@ exports.set_member_direct = function(sid, fn){
 };
 
 
-exports.set_member_device = function(sid, xid, device, uuid, push_token){
+exports.setMemberDevice = function(memberIndex, uuid, device, pushToken){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
 			throw err;
 		}
 		
-		connection.query('USE xenix_service_db', function(err, rows, fields){
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL XSP_MEMBER_DEVICE_SET('+sid+', '+xid+', "'+device+'", "'+uuid+'", "'+push_token+'")', function(err, rows, fields) {
+			connection.query('CALL USP_SET_MEMBER_DEVICE('+memberIndex+', "'+uuid+'", "'+device+'", "'+pushToken+'")', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		

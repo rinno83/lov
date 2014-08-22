@@ -22,3 +22,8 @@
 {"level":"error","message":"device is not defined","timestamp":"2014-06-10T18:38:27.965Z"}
 {"level":"error","message":"device is not defined","timestamp":"2014-06-10T18:39:32.619Z"}
 {"level":"error","message":"파라미터 오류","timestamp":"2014-06-10T18:44:52.750Z"}
+{"level":"error","message":"NULL is not defined","timestamp":"2014-08-14T15:45:41.023Z"}
+{"level":"error","message":"resArray is not defined","timestamp":"2014-08-21T16:31:45.734Z"}
+{"level":"error","message":"type is not defined","timestamp":"2014-08-21T19:50:05.651Z"}
+{"level":"error","message":"No boundary key found.","timestamp":"2014-08-21T19:51:19.283Z"}
+{"level":"error","message":"type is not defined","timestamp":"2014-08-21T19:52:58.238Z"}

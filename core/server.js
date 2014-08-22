@@ -32,6 +32,7 @@ start = function start()
 	    // Create a new Express application
 	    var server = express();	    
 	    
+		//server.use(express.bodyParser());
 		server.use(bodyParser());
 		server.use(methodOverride());
 	    
