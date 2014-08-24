@@ -8,6 +8,7 @@ var _             = require('lodash'),
 	member        = require('./member'),
 	service        = require('./service'),
 	upload        = require('./upload'),
+	util        = require('./util'),
 	mysql_manager	= require('../handler/mysql_handler'),	
 	redis_manager = require('../handler/redis_handler'),
 	winston 		= require("winston"),	
@@ -97,12 +98,13 @@ http = function (apiMethod) {
 	return function (req, res) {
 		var object = req.body,
 			options = {};	
-
+		
+		object.uuid = req.headers.uuid;
+		object.device = req.headers.device;
+		
 		if( req.headers != undefined && req.headers.accesstoken != undefined ) 
 		{
-			object.token = req.headers.accesstoken;
-			object.uuid = req.headers.uuid;
-			object.device = req.headers.device;
+			object.token = req.headers.accesstoken;			
 						
 			loadController(apiMethod, object, res, options);		
 		}
@@ -117,5 +119,6 @@ module.exports = {
 	http: http,
 	member: member,
 	service: service,
-	upload: upload
+	upload: upload,
+	util: util
 };

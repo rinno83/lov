@@ -5,13 +5,17 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	/**
-	* @api {post} /member/social 소셜 회원가입 및 로그인
-	* @apiName 소셜 회원가입 및 로그인
+	* @api {post} /member/social 소셜 회원가입
+	* @apiName 소셜 회원가입
 	* @apiGroup Member
 	*
-	* @apiParam {Int} registLevel Regist Level.[2 고정]
 	* @apiParam {String} socialId Member Social ID.
-	* @apiParam {String} socialType Member Social Type [MT001 : Kakao, MT002 : Facebook, MT003 : Naver ].
+	* @apiParam {String} nickname Member Nickname.
+	* @apiParam {String} profileImageUrl Member Profile Image URL.
+	* @apiParam {String} uuid Member Device UUID.
+	* @apiParam {String} device Member Device OS [ ANDROID / IPHONE ].
+	* @apiParam {String} pushToken Member Device Push Token.
+	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
 	*
 	* @apiSuccess {String} resultMessage  Result Message.
 	* @apiSuccess {Object[]} data  Result Data.
@@ -27,6 +31,55 @@
 	*	  }
 	*
 	*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//									Member Login											   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {post} /member/social 소셜 로그인
+	* @apiName 소셜 로그인
+	* @apiGroup Member
+	*
+	* @apiParam {String} socialId Member Social ID.
+	* @apiParam {String} nickname Member Nickname.
+	* @apiParam {String} profileImageUrl Member Profile Image URL.
+	* @apiParam {String} uuid Member Device UUID.
+	* @apiParam {String} device Member Device OS [ ANDROID / IPHONE ].
+	* @apiParam {String} pushToken Member Device Push Token.
+	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
+	*
+	* @apiSuccess {String} resultMessage  Result Message.
+	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {String} data.memberToken  Member Token.
+	* @apiSuccess {String} data.socialId  Member Social ID.
+	* @apiSuccess {String} data.nickname  Member Nickname.
+	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.
+	* @apiSuccess {Int} data.spearCount  Member Spear Count.
+	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.
+	* @apiSuccess {String} data.title  Member 칭호.
+	* @apiSuccess {String} data.registDate  Member Regist Date.
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	  {
+	*	     "resultMessage": "성공",
+	*	     "data":  {
+	*	        "memberIndex": 7,
+	*	        "socialId": "12345678913",
+	*	        "nickname": "doogoon",
+	*	        "profileImageUrl": "",
+	*	        "spearCount": 5,
+	*	        "spearRemainTime": 334,
+	*	        "title": "시민",
+	*	        "registDate": "2014-08-24 02:24:16"
+	*	    }
+	*	  }
+	*
+	*/
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +117,7 @@
 	* @apiGroup Member
 	*
 	*
-	* @apiParam {String} friends Member Facebook Friends [JsonArray].	
+	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
 	*
 	*
 	* @apiSuccessExample Success-Response:
@@ -89,8 +142,12 @@
 	*
 	*
 	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {String} data.socialId  Member Social ID.	
 	* @apiSuccess {String} data.nickname  Member Nickname.	
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
+	* @apiSuccess {Int} data.spearCount  Member Spear Count.	
+	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
+	* @apiSuccess {String} data.title  Member 칭호.	
 	* @apiSuccess {String} data.teamName  Member Team Name.	
 	* @apiSuccess {String} data.teamImageUrl  Member Team Image URL.	
 	*
@@ -101,10 +158,14 @@
 	*	     "resultCode": 1,
 	*	     "resultMessage": "성공",
 	*	   	 "data": {
+	*	        "socialId": "12345678913",
 	*	        "nickname": "doogoon",
-	*	        "profileImageUrl": "http://image.tvdaily.co.kr/upimages/gisaimg/201203/1330754784_281586.jpg",
-	*	        "teamName": "blue",
-	*	        "teamImageUrl": "http://rlv.zcache.com/team_blue_polka_dot_stars_round_sticker-p217941021613239303en8ct_265.jpg"
+	*	        "profileImageUrl": "",
+	*	        "spearCount": 5,
+	*	        "title": "시민",
+	*	        "teamName": "RED",
+	*	        "teamImageUrl": "http://54.178.134.74/files/red_team.jpg",
+	*	        "spearRemainTime": 0
 	*	    }
 	*	  }
 	*
@@ -124,10 +185,17 @@
 	* @apiName 회원 정보 수정
 	* @apiGroup Member
 	*
+	* @apiParam {String} nickname Member Nickname.	
+	* @apiParam {String} profileImageUrl Member Profile Image URL.	
+	* @apiParam {String} pushToken Member Push Token.	
 	*
 	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {String} data.socialId  Member Social ID.	
 	* @apiSuccess {String} data.nickname  Member Nickname.	
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
+	* @apiSuccess {Int} data.spearCount  Member Spear Count.	
+	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
+	* @apiSuccess {String} data.title  Member 칭호.	
 	* @apiSuccess {String} data.teamName  Member Team Name.	
 	* @apiSuccess {String} data.teamImageUrl  Member Team Image URL.	
 	*
@@ -138,10 +206,14 @@
 	*	     "resultCode": 1,
 	*	     "resultMessage": "성공",
 	*	   	 "data": {
-	*	        "nickname": "doogoon",
-	*	        "profileImageUrl": "http://image.tvdaily.co.kr/upimages/gisaimg/201203/1330754784_281586.jpg",
-	*	        "teamName": "blue",
-	*	        "teamImageUrl": "http://rlv.zcache.com/team_blue_polka_dot_stars_round_sticker-p217941021613239303en8ct_265.jpg"
+	*	        "socialId": "12345678913",
+	*	        "nickname": "doogoon01",
+	*	        "profileImageUrl": "",
+	*	        "spearCount": 5,
+	*	        "title": "시민",
+	*	        "teamName": "RED",
+	*	        "teamImageUrl": "http://54.178.134.74/files/red_team.jpg",
+	*	        "spearRemainTime": 0
 	*	    }
 	*	  }
 	*

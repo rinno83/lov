@@ -21,8 +21,9 @@ redisConnection.prototype.get = function get(key, fn) {
 	this.redisClient.quit();
 }
 
-redisConnection.prototype.del = function del(key) {
+redisConnection.prototype.del = function del(key, fn) {
 	this.redisClient.del(key, function(err, reply){
+		return fn(null, reply);
 	}); // redis.print -> log
 	
 	this.redisClient.quit();
