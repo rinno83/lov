@@ -6,6 +6,7 @@ var when				= require('when'),
 	redis_manager	= require('../handler/redis_handler'),
 	mongodb_manager	= require('../handler/mongodb_handler'),
 	token_manager	= require('../handler/token_handler'),
+	team_manager	= require('../handler/team_handler'),
 	methodOverride	= require("method-override"),
 	querystring		= require("querystring"),
 	path			= require("path"),
@@ -74,7 +75,7 @@ member = {
 						mysql_manager.upsertMemberFriends(memberIndex, friendsString, friendType);	
 					}
 					
-					if(dbData[0].result == 1)
+					if(dbData[0].result == 1) // join
 					{
 						// Set Member Device in Mysql
 						mysql_manager.setMemberDevice(memberIndex, uuid, device, pushToken, function(err, mysqlResult) {
@@ -96,6 +97,9 @@ member = {
 								var redisInstance = new redis_manager(config().redis);
 								redisInstance.set(redisKey, memberIndex, function(err, reply){});
 								
+								// Set Team
+								team_manager.selectTeam(memberIndex);
+								
 								
 								// Response
 								var resArray = {
@@ -108,7 +112,7 @@ member = {
 							}
 						});						
 					}
-					else if(dbData[0].result == 2)
+					else if(dbData[0].result == 2) // login
 					{
 						// Get Member Token
 						var memberToken = token_manager.makeMemberToken(memberIndex, device, uuid);
@@ -120,34 +124,9 @@ member = {
 						var redisInstance = new redis_manager(config().redis);
 						redisInstance.set(redisKey, memberIndex, function(err, reply){});
 						
-						var resArray = dbData[0];
-						var spearCount = 5;
-						var	spearReaminTime = 0;
-						
-						if(resArray.spearUpdateDate != undefined)
-						{
-							var startDate = moment(resArray.spearUpdateDate, 'YYYY-M-DD HH:mm:ss');
-							var endDate = moment();
-							var secondsDiff = endDate.diff(startDate, 'seconds');
-							
-							spearCount = resArray.spearCount + Math.floor(secondsDiff / 600);
-							spearReaminTime = 600 - (secondsDiff % 600);
-							
-							if(spearCount >= 5)
-							{
-								spearCount = 5;
-								spearReaminTime = 0;
-							}
-						}
-						
-						resArray.memberToken = memberToken;
-						resArray.spearCount = spearCount;
-						resArray.spearRemainTime = spearReaminTime;
-						resArray.registDate = dateformat(resArray.registDate, 'yyyy-mm-dd HH:MM:ss');
-						
-						delete resArray.result;
-						delete resArray.spearUpdateDate;
-						delete resArray.memberIndex;
+						var resArray = {
+							'token':memberToken
+						};
 						
 						resData.resultmessage = '로그인 성공';
 						resData.data = resArray;
@@ -336,8 +315,7 @@ member = {
 							
 							resArray.spearCount = spearCount;
 							resArray.spearRemainTime = spearReaminTime;
-							
-							delete resArray.spearUpdateDate;
+							resArray.spearUpdateDate = dateformat(resArray.spearUpdateDate, 'yyyy-mm-dd HH:MM:ss');
 							
 							resData.resultCode = 1;
 							resData.resultmessage = '성공';

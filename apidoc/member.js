@@ -1,19 +1,17 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //																							   //
-//									Regist Member Social									   //
+//							Regist Member Social && Member Login							   //
 //																							   //
 /////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	/**
-	* @api {post} /member/social 소셜 회원가입
-	* @apiName 소셜 회원가입
+	* @api {post} /member/social 소셜 회원가입 및 로그인
+	* @apiName 소셜 회원가입 및 로그인
 	* @apiGroup Member
 	*
 	* @apiParam {String} socialId Member Social ID.
 	* @apiParam {String} nickname Member Nickname.
 	* @apiParam {String} profileImageUrl Member Profile Image URL.
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS [ ANDROID / IPHONE ].
 	* @apiParam {String} pushToken Member Device Push Token.
 	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
 	*
@@ -31,55 +29,6 @@
 	*	  }
 	*
 	*/
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//																							   //
-//									Member Login											   //
-//																							   //
-/////////////////////////////////////////////////////////////////////////////////////////////////	
-
-	/**
-	* @api {post} /member/social 소셜 로그인
-	* @apiName 소셜 로그인
-	* @apiGroup Member
-	*
-	* @apiParam {String} socialId Member Social ID.
-	* @apiParam {String} nickname Member Nickname.
-	* @apiParam {String} profileImageUrl Member Profile Image URL.
-	* @apiParam {String} uuid Member Device UUID.
-	* @apiParam {String} device Member Device OS [ ANDROID / IPHONE ].
-	* @apiParam {String} pushToken Member Device Push Token.
-	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
-	*
-	* @apiSuccess {String} resultMessage  Result Message.
-	* @apiSuccess {Object[]} data  Result Data.
-	* @apiSuccess {String} data.memberToken  Member Token.
-	* @apiSuccess {String} data.socialId  Member Social ID.
-	* @apiSuccess {String} data.nickname  Member Nickname.
-	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.
-	* @apiSuccess {Int} data.spearCount  Member Spear Count.
-	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.
-	* @apiSuccess {String} data.title  Member 칭호.
-	* @apiSuccess {String} data.registDate  Member Regist Date.
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "resultMessage": "성공",
-	*	     "data":  {
-	*	        "memberIndex": 7,
-	*	        "socialId": "12345678913",
-	*	        "nickname": "doogoon",
-	*	        "profileImageUrl": "",
-	*	        "spearCount": 5,
-	*	        "spearRemainTime": 334,
-	*	        "title": "시민",
-	*	        "registDate": "2014-08-24 02:24:16"
-	*	    }
-	*	  }
-	*
-	*/
-
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
