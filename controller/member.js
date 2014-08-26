@@ -312,6 +312,8 @@ member = {
 						{
 							var dbData = JSON.parse(mysqlResult);
 							
+							console.log(dbData);
+							
 							var resArray = dbData[0];
 							var spearCount = 5;
 							var	spearReaminTime = 0;
