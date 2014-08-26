@@ -313,18 +313,23 @@ member = {
 							var dbData = JSON.parse(mysqlResult);
 							
 							var resArray = dbData[0];
-						
-							var startDate = moment(resArray.spearUpdateDate, 'YYYY-M-DD HH:mm:ss');
-							var endDate = moment();
-							var secondsDiff = endDate.diff(startDate, 'seconds');
+							var spearCount = 5;
+							var	spearReaminTime = 0;
 							
-							var spearCount = resArray.spearCount + Math.floor(secondsDiff / 600);
-							var spearReaminTime = 600 - (secondsDiff % 600);
-							
-							if(spearCount >= 5)
+							if(resArray.spearUpdateDate != null)
 							{
-								spearCount = 5;
-								spearReaminTime = 0;
+								var startDate = moment(resArray.spearUpdateDate, 'YYYY-M-DD HH:mm:ss');
+								var endDate = moment();
+								var secondsDiff = endDate.diff(startDate, 'seconds');
+								
+								spearCount = resArray.spearCount + Math.floor(secondsDiff / 600);
+								spearReaminTime = 600 - (secondsDiff % 600);
+								
+								if(spearCount >= 5)
+								{
+									spearCount = 5;
+									spearReaminTime = 0;
+								}
 							}
 							
 							resArray.spearCount = spearCount;
