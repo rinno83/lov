@@ -124,7 +124,7 @@ member = {
 						var spearCount = 5;
 						var	spearReaminTime = 0;
 						
-						if(resArray.spearUpdateDate != null)
+						if(resArray.spearUpdateDate != undefined)
 						{
 							var startDate = moment(resArray.spearUpdateDate, 'YYYY-M-DD HH:mm:ss');
 							var endDate = moment();
@@ -316,7 +316,7 @@ member = {
 							var spearCount = 5;
 							var	spearReaminTime = 0;
 							
-							if(resArray.spearUpdateDate != null)
+							if(resArray.spearUpdateDate != undefined)
 							{
 								var startDate = moment(resArray.spearUpdateDate, 'YYYY-M-DD HH:mm:ss');
 								var endDate = moment();
