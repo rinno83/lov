@@ -13,7 +13,6 @@
 	* @apiParam {String} nickname Member Nickname.
 	* @apiParam {String} profileImageUrl Member Profile Image URL.
 	* @apiParam {String} pushToken Member Device Push Token.
-	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
 	*
 	* @apiSuccess {String} resultMessage  Result Message.
 	* @apiSuccess {Object[]} data  Result Data.
@@ -97,8 +96,7 @@
 	* @apiSuccess {Int} data.spearCount  Member Spear Count.	
 	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
 	* @apiSuccess {String} data.title  Member 칭호.	
-	* @apiSuccess {String} data.teamName  Member Team Name.	
-	* @apiSuccess {String} data.teamImageUrl  Member Team Image URL.	
+	* @apiSuccess {Int} data.teamIndex  Member Team Index.	
 	*
 	*
 	* @apiSuccessExample Success-Response:
@@ -112,8 +110,7 @@
 	*	        "profileImageUrl": "",
 	*	        "spearCount": 5,
 	*	        "title": "시민",
-	*	        "teamName": "RED",
-	*	        "teamImageUrl": "http://54.178.134.74/files/red_team.jpg",
+	*	        "teamIndex": 1
 	*	        "spearRemainTime": 0
 	*	    }
 	*	  }

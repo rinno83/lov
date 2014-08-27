@@ -13,6 +13,11 @@ apiRoutes = function (server) {
 	server.put('/member/info/update', controller.http(controller.member.info_update));
 	server.get('/member/logout', controller.http(controller.member.logout));
 
+	// Land
+	server.post('/land/conquer', controller.http(controller.land.conquer));
+	
+	// Service
+	server.get('/service/version', controller.http(controller.service.version));
 
 	// File
 	server.post('/upload/complete', controller.http(controller.upload.complete));

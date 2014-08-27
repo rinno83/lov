@@ -146,3 +146,65 @@ exports.upsertMemberFriends = function(memberIndex, friends, friendType){
 };
 
 
+
+
+
+
+
+exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_SET_MEMBER_LAND_CONQUER('+memberIndex+', '+landIndex+', '+lat+', '+lon+')', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			});
+						    
+		});
+	});
+};
+
+
+
+
+
+
+
+exports.getServiceVersion = function(serviceIndex, device, fn){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_GET_SERVICE_VERSION('+serviceIndex+', "'+device+'")', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			    else
+			    {
+				    return fn(err, JSON.stringify(rows[0]));
+			    }
+			});
+						    
+		});
+	});
+};

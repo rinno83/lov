@@ -6,66 +6,59 @@ var when				= require('when'),
 	redis_manager	= require('../handler/redis_handler'),
 	mongodb_manager	= require('../handler/mongodb_handler'),
 	token_manager	= require('../handler/token_handler'),
+	team_manager	= require('../handler/team_handler'),
 	methodOverride	= require("method-override"),
 	querystring		= require("querystring"),
 	path			= require("path"),
 	http  			= require("http"),
 	crypto 			= require("crypto"),
 	dateformat 		= require("dateformat"),
-	member;
+	moment 			= require('moment'),
+	land;
 	
 
-function get_device_key(sid, device, uuid)
+function get_member_token_key(device, token)
 {
-	return key_string = "DEVICE::"+sid+"::"+device+"::"+uuid;
-	//return new Buffer(key_string).toString('base64');
+	return key_string = "TOKEN::"+device+"::"+token;
 }
 
-function get_member_token_key(sid, device, token)
-{
-	return key_string = "TOKEN::"+sid+"::"+device+"::"+token;
-}
+land = {
 
-function get_reg_token_key(sid, token)
-{
-	return key_string = "REGIST::"+sid+"::"+token;
-}
-
-
-service = {
-
-	version : function version(response, body, options) {
+	conquer : function conquer(response, body, options) {
 		
 		console.log('conquer');
 		var resData = {};
 		
-		if(body.device != null)
+		if(body.token != null && body.uuid != null && body.device != null && body.landIndex != null && body.lat != null && body.lon != null)
 		{
+			var token = body.token;
+			var uuid = body.uuid;
 			var device = body.device;
-			var serviceIndex = 1;
 			
-			mysql_manager.getServiceVersion(serviceIndex, device, function(err, mysqlResult){
-				if(err)
+			var landIndex = body.landIndex;
+			var lat = body.lat;
+			var lon = body.lon;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
 				{
-					resData.result = 10;
-					resData.resultmessage = '서버 getServiceVersion() 오류';
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
 					
-					response.json(500, resData);
+					response.json(400, resData);
 				}
 				else
 				{
-					var dbData = JSON.parse(mysqlResult);
-					var resArray = dbData[0];
-					
-					resArray.landDBFileUrl = 'http://54.178.134.74/files/tb_land.sqlite';
+					var memberIndex = reply;
+					mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon);
 					
 					resData.resultCode = 1;
 					resData.resultmessage = '성공';
-					resData.data = resArray;
 					
 					response.json(200, resData);
 				}
-				
 			});
 		}
 		else {
@@ -79,4 +72,4 @@ service = {
 
 };
 
-module.exports = service;
+module.exports = land;

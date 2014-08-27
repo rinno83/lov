@@ -8,6 +8,7 @@ var _             = require('lodash'),
 	member        = require('./member'),
 	service        = require('./service'),
 	upload        = require('./upload'),
+	land        = require('./land'),
 	util        = require('./util'),
 	mysql_manager	= require('../handler/mysql_handler'),	
 	redis_manager = require('../handler/redis_handler'),
@@ -120,5 +121,6 @@ module.exports = {
 	member: member,
 	service: service,
 	upload: upload,
-	util: util
+	util: util,
+	land: land
 };
