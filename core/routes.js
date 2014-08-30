@@ -21,6 +21,9 @@ apiRoutes = function (server) {
 
 	// File
 	server.post('/upload/complete', controller.http(controller.upload.complete));
+	
+	// Team
+	server.get('/team/info', controller.http(controller.team.info));
 		
 };
 

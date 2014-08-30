@@ -14,13 +14,13 @@
 	* @apiParam {String} profileImageUrl Member Profile Image URL.
 	* @apiParam {String} pushToken Member Device Push Token.
 	*
-	* @apiSuccess {String} resultMessage  Result Message.
 	* @apiSuccess {Object[]} data  Result Data.
 	* @apiSuccess {String} data.token  Member Token.
 	*
 	* @apiSuccessExample Success-Response:
 	*     HTTP/1.1 200 OK
 	*	  {
+	*	     "resultCode": 1,
 	*	     "resultMessage": "성공",
 	*	     "data": {
 	*	        "token": "NDliZTZlMjllZTNmMGNiOGZkOGRiNzQxZGVjNDZhMjg0ZDQ2ODdlYjgwNTc5ODgzNTVlZTZiZjdhNjdjNmQwNQ==",

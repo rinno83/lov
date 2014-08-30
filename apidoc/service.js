@@ -10,7 +10,6 @@
 	* @apiGroup Service
 	*
 	*
-	* @apiSuccess {String} resultMessage  Result Message.
 	* @apiSuccess {Object[]} data  Result Data.
 	* @apiSuccess {String} data.versionCode  Service Version Code [ Int형 ].
 	* @apiSuccess {String} data.versionName  Service Version Name [ ex) 1.0.0 ].
@@ -22,6 +21,7 @@
 	* @apiSuccessExample Success-Response:
 	*     HTTP/1.1 200 OK
 	*	  {
+	*	     "resultCode": 1,
 	*	     "resultMessage": "성공",
 	*	     "data": {
 	*	        "versionCode": 1,

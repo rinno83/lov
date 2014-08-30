@@ -17,6 +17,8 @@
 	* @apiSuccessExample Success-Response:
 	*     HTTP/1.1 200 OK
 	*	  {
+	*	     "resultCode": 1,
+	*	     "resultMessage": "성공"	
 	*	  }
 	*
 	*/
