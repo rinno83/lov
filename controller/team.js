@@ -56,7 +56,7 @@ team = {
 							
 							resData.resultCode = 1;
 							resData.resultmessage = '성공';
-							resData.dadta = dbData;
+							resData.data = dbData;
 							
 							response.json(200, resData);	
 						}
