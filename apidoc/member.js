@@ -191,3 +191,32 @@
 	*
 	*/	
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//								Member Profile Image Upload									   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {post} /file_upload 회원 프로필 사진 업로드
+	* @apiName 회원 프로필 사진 업로드
+	* @apiGroup Member
+	*
+	*
+	* @apiParam {Binary} file Member Profile Image File Name.		
+	*
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	  {
+	*	    "resultCode": 1,
+	*	    "resultMessage": "성공",
+	*	    "data": {
+	*	        "file_url": "http://54.178.134.74/files/0000000009.jpg"
+	*	    }
+	*	}
+	*
+	*/	
+

@@ -6,6 +6,7 @@ var when				= require('when'),
 	redis_manager	= require('../handler/redis_handler'),
 	mongodb_manager	= require('../handler/mongodb_handler'),
 	token_manager	= require('../handler/token_handler'),
+	push_manager	= require('../handler/push_handler'),
 	methodOverride	= require("method-override"),
 	querystring		= require("querystring"),
 	path			= require("path"),
@@ -36,7 +37,7 @@ service = {
 
 	version : function version(response, body, options) {
 		
-		console.log('conquer');
+		console.log('version');
 		var resData = {};
 		
 		if(body.device != null)
@@ -75,6 +76,30 @@ service = {
 			response.json(400, resData);
 		}
 		
+	},
+	
+	
+	push_test : function push_test(response, body, options) {
+		
+		console.log('send push');
+		var resData = {};
+		
+		mysql_manager.getMemberToken(4, function(err, mysqlResult){
+			if(err)
+			{
+				resData.result = 10;
+				resData.resultmessage = '서버 getMemberToken() 오류';
+				
+				response.json(500, resData);
+			}
+			else
+			{
+				var dbData = JSON.parse(mysqlResult);
+				push_manager.sendAPNS(dbData[0].pushToken);
+				
+				response.json(200, resData);
+			}
+		});		
 	}
 
 };

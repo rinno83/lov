@@ -23,6 +23,12 @@ config = {
 		url : {
 			host: 'http://localhost:8888/',
 			path: 'files/'
+		},
+		mongodb: {
+			url : 'mongodb://localhost:27017/doogoon_lov_log',
+			host : '127.0.0.1',
+			port : '27017',
+			db : 'doogoon_lov_log'
 		}
 	},
 
@@ -49,6 +55,12 @@ config = {
 		url : {
 			host: 'http://54.178.134.74/',
 			path: 'files/'
+		},
+		mongodb: {
+			url : 'mongodb://localhost:27017/doogoon_lov_log',
+			host : '127.0.0.1',
+			port : '27017',
+			db : 'doogoon_lov_log'
 		}
 	}
 };

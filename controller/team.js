@@ -6,7 +6,6 @@ var when				= require('when'),
 	redis_manager	= require('../handler/redis_handler'),
 	mongodb_manager	= require('../handler/mongodb_handler'),
 	token_manager	= require('../handler/token_handler'),
-	team_manager	= require('../handler/team_handler'),
 	methodOverride	= require("method-override"),
 	querystring		= require("querystring"),
 	path			= require("path"),
@@ -20,7 +19,7 @@ var when				= require('when'),
 
 team = {
 
-	info: function token(response, body, options) {
+	info: function info(response, body, options) {
 		
 		//console.log('login');
 		var resData = {};

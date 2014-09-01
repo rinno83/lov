@@ -6,7 +6,7 @@ var when				= require('when'),
 	redis_manager	= require('../handler/redis_handler'),
 	mongodb_manager	= require('../handler/mongodb_handler'),
 	token_manager	= require('../handler/token_handler'),
-	team_manager	= require('../handler/team_handler'),
+	team			= require('./team'),
 	methodOverride	= require("method-override"),
 	querystring		= require("querystring"),
 	path			= require("path"),
@@ -36,12 +36,14 @@ member = {
 			profileImageUrl = (body.profileImageUrl == undefined)?'':body.profileImageUrl;
 			friends = (body.friends == undefined)?'':body.friends;
 			friendType = 'facebook';
-			
+			introduce = '안녕하세요. '+nick+'입니다.';
+						
 			uuid = body.uuid;
 			device = body.device;
 			pushToken = (body.pushToken == undefined)?'':body.pushToken;
+
 			
-			mysql_manager.insertMember(socialId, nick, profileImageUrl, function(err, data){
+			mysql_manager.insertMember(socialId, nick, profileImageUrl, introduce, function(err, data){
 				if(err)
 				{
 					resData.resultCode = 10;				
@@ -52,6 +54,7 @@ member = {
 				else
 				{
 					var dbData = JSON.parse(data);
+					console.log(dbData);
 					
 					memberIndex = dbData[0].memberIndex;
 					
@@ -98,7 +101,7 @@ member = {
 								redisInstance.set(redisKey, memberIndex, function(err, reply){});
 								
 								// Set Team
-								team_manager.selectTeam(memberIndex);
+								mysql_manager.setMemberTeam(memberIndex);
 								
 								
 								// Response

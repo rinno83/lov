@@ -21,7 +21,7 @@
 	*	  {
 	*	    "resultCode": 1,
 	*	    "resultmessage": "성공",
-	*	    "dadta": [
+	*	    "data": [
 	*	        {
 	*	            "teamConquerCount": 2,
 	*	            "teamIndex": 1,

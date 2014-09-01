@@ -4,7 +4,7 @@ var config = require('../core/configuration/index.js')
 var pool = mysql.createPool(config().database);
 
 //connection.query('USE xenix_doogoon_db');
-exports.insertMember = function(socialId, nick, profileImageUrl, fn){
+exports.insertMember = function(socialId, nick, profileImageUrl, introduce, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
@@ -13,7 +13,7 @@ exports.insertMember = function(socialId, nick, profileImageUrl, fn){
 		
 		connection.query('USE doogoon_lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL USP_INSERT_MEMBER("'+socialId+'", "'+nick+'", "'+profileImageUrl+'")', function(err, rows, fields) {
+			connection.query('CALL USP_INSERT_MEMBER("'+socialId+'", "'+nick+'", "'+profileImageUrl+'", "'+introduce+'")', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		
@@ -176,6 +176,31 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon){
 };
 
 
+exports.setMemberTeam = function(memberIndex){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_SET_MEMBER_TEAM('+memberIndex+')', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			});
+						    
+		});
+	});
+};
+
+
 
 
 
@@ -220,6 +245,35 @@ exports.getTeamInfo = function(fn){
 		connection.query('USE doogoon_lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_TEAM_INFO()', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			    else
+			    {
+				    return fn(err, JSON.stringify(rows[0]));
+			    }
+			});
+						    
+		});
+	});
+};
+
+
+exports.getMemberToken = function(memberIndex, fn){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_GET_MEMBER_TOKEN('+memberIndex+')', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		

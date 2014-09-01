@@ -52,7 +52,10 @@ land = {
 				else
 				{
 					var memberIndex = reply;
+					console.log(memberIndex);
 					mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon);
+					
+					mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, lat, lon);
 					
 					resData.resultCode = 1;
 					resData.resultmessage = '성공';
