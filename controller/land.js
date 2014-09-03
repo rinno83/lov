@@ -52,10 +52,40 @@ land = {
 				else
 				{
 					var memberIndex = reply;
-					console.log(memberIndex);
 					mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon);
 					
-					mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, lat, lon);
+					mongodb_manager.getLastConquerMemberIndex('conquer.log', landIndex, function(err, mongoResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 getLastConquerMemberIndex 오류';
+							
+							response.json(500, resData);
+						}
+						else
+						{
+							if(mongoResult.length > 0)
+							{
+								mongodb_manager.updateConquerNextMemberIndex('conquer.log', memberIndex, mongoResult[0]._id, function(err, updateResult){
+									if(err)
+									{
+										resData.result = 10;
+										resData.resultmessage = '서버 updateConquerNextMemberIndex 오류';
+										
+										response.json(500, resData);
+									}
+									else
+									{
+										mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+									}
+								});
+							}
+							else
+							{
+								mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+							}
+						}
+					});
 					
 					resData.resultCode = 1;
 					resData.resultmessage = '성공';

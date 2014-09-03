@@ -14,6 +14,7 @@
 	* @apiSuccess {Int} data.teamIndex  Team Index.
 	* @apiSuccess {String} data.teamName  Team Name.
 	* @apiSuccess {Int} data.teamConquerCount  Team Conquer Land Count.
+	* @apiSuccess {String} data.teamColor  Team Colro.
 	*
 	*
 	* @apiSuccessExample Success-Response:
@@ -25,12 +26,14 @@
 	*	        {
 	*	            "teamConquerCount": 2,
 	*	            "teamIndex": 1,
-	*	            "teamName": "BLUE"
+	*	            "teamName": "BLUE",
+	*	            "teamColor": "4F6F9F"
 	*	        },
 	*	        {
 	*	            "teamConquerCount": 1,
 	*	            "teamIndex": 2,
-	*	            "teamName": "RED"
+	*	            "teamName": "RED",
+	*	            "teamColor": "FFFFFF",
 	*	        }
 	*	    ]
 	*	}

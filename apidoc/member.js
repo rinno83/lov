@@ -93,6 +93,7 @@
 	* @apiSuccess {String} data.socialId  Member Social ID.	
 	* @apiSuccess {String} data.nickname  Member Nickname.	
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
+	* @apiSuccess {String} data.introduce  Member 소개글.	
 	* @apiSuccess {Int} data.spearCount  Member Spear Count.	
 	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
 	* @apiSuccess {String} data.title  Member 칭호.	
@@ -108,6 +109,7 @@
 	*	        "socialId": "12345678913",
 	*	        "nickname": "doogoon",
 	*	        "profileImageUrl": "",
+	*	        "introduce": "안녕하세요. Heesu Kim입니다.",
 	*	        "spearCount": 5,
 	*	        "title": "시민",
 	*	        "teamIndex": 1
@@ -258,6 +260,54 @@
 	*	            "memberIndex": 10,
 	*	            "nickname": "DooHwa Lee",
 	*	            "profileImageUrl": "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xap1/t1.0-1/p50x50/10299076_678925182170293_3025102234137164045_n.jpg"
+	*	        },
+	*	        {
+	*	            ...
+	*	        }
+	*	    ]
+	*	}
+	*
+	*/	
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//									Member History											   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {get} /member/history 회원 정복 히스토리
+	* @apiName 회원 정복 히스토리
+	* @apiGroup Member
+	*
+	*
+	* @apiParam {Int} offset History Offset [ Default : 0, Optional ]
+	* @apiParam {Int} limit History Limit [ Default : 20, Optional ]
+	*
+	*
+	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {Int} data.landIndex  땅 Index.
+	* @apiSuccess {Int} data.nextConquerMemberIndex  자신 다음으로 해당 동을 점령한 회원 Index [ 0 : 자신 땅, else : 그 회원 땅 ].
+	* @apiSuccess {Float} data.lat  회원 Latitude.
+	* @apiSuccess {Float} data.lon  회원 Longitude.
+	* @apiSuccess {Timestamp} data.registDate  회원 히스토리 작성 일시
+	*
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	  {
+	*	    "resultCode": 1,
+	*	    "resultMessage": "성공",
+	*	    "data": [
+	*	        {
+	*	            "landIndex": "3516",
+	*	            "nextConquerMemberIndex": 0,
+	*	            "lat": "37.42343",
+	*	            "lon": "127.342545",
+	*	            "registDate": 1409762609535
 	*	        },
 	*	        {
 	*	            ...
