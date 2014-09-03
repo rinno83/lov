@@ -74,6 +74,69 @@ team = {
 	},
 	
 	
+	rank: function rank(response, body, options) {
+		
+		//console.log('login');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null)
+		{
+			var token = body.token;
+			var uuid = body.uuid;
+			var device = body.device;
+			
+			var offset = (body.offset == undefined)?0:body.offset;
+			var limit = (body.limit == undefined)?10:body.limit;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
+				{
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
+					
+					response.json(400, resData);
+				}
+				else
+				{
+					var memberIndex = reply;
+
+					mysql_manager.getTeamMemberRank(memberIndex, offset, limit, function(err, mysqlResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 getMemberRank() 오류';
+							
+							response.json(400, resData);
+						}
+						else
+						{
+							var dbData = JSON.parse(mysqlResult);
+							
+							var resArray = dbData;
+									
+							resData.resultCode = 1;
+							resData.resultmessage = '성공';
+							resData.data = resArray;
+							
+							response.json(200, resData);
+							
+						}
+					});
+				}
+			});
+		}
+		else {
+			resData.result = 11;
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
+	}
+	
+	
 
 };
 

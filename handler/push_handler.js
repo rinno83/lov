@@ -13,7 +13,7 @@ exports.sendAPNS = function(memberToken){
 	var myDevice = new apn.Device(memberToken);
 
 	var note = new apn.Notification();
-	note.badge = 3;
+	note.badge = 1;
 	note.alert = 'saltfactory 푸시 테스트';
 	note.payload = {'message': '안녕하세요'};
 	

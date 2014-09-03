@@ -5,10 +5,10 @@ config = {
 	// ### Development **(default)**
 	development: {
 		database: {
-			host : '127.0.0.1',
+			host : '54.64.38.36',
 			user : 'root',
-			password : 'root',
-			port : '8889'
+			password : 'superapp5!',
+			port : '3306'
 		},
 		server: {
 			// Host to be passed to node's `net.Server#listen()`

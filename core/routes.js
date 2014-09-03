@@ -12,6 +12,7 @@ apiRoutes = function (server) {
 	server.get('/member/info', controller.http(controller.member.info));
 	server.put('/member/info/update', controller.http(controller.member.info_update));
 	server.get('/member/logout', controller.http(controller.member.logout));
+	server.get('/member/rank', controller.http(controller.member.rank));
 
 	// Land
 	server.post('/land/conquer', controller.http(controller.land.conquer));
@@ -25,6 +26,7 @@ apiRoutes = function (server) {
 	
 	// Team
 	server.get('/team/info', controller.http(controller.team.info));
+	server.get('/team/rank', controller.http(controller.team.rank));
 		
 };
 

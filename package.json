@@ -1,6 +1,6 @@
 {
   "name": "League_Of_Village",
-  "description": "League Of Village API Server : http://54.178.134.74:9001/",
+  "description": "League Of Village API Server : http://54.64.38.36:9001/",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
