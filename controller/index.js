@@ -101,10 +101,12 @@ http = function (apiMethod) {
 		var object = req.body,
 			options = {};	
 		
-		console.log(object);
+		//console.log(req);
+		//console.log(object);
 		
 		object.uuid = req.headers.uuid;
 		object.device = req.headers.device;
+		object.query = req.query;
 		
 		if( req.headers != undefined && req.headers.accesstoken != undefined ) 
 		{

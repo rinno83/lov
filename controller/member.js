@@ -625,6 +625,32 @@ member = {
 			response.json(400, resData);
 		}
 		
+	},
+	
+	code: function code(response, body, options) {
+		
+		//console.log('login');
+		var n = 5;
+		var array = [
+			[0, 1, 2, 0, 0],
+			[0, 0, 0, 1, 0],
+			[0, 1, 0, 1, 0],
+			[0, 0, 2, 1, 0],
+			[2, 1, 0, 0, 0],
+		];
+		
+		console.log(array[0][0]);
+		var me = 9999;
+		
+		for(var i=0; i<n; i++)
+		{
+			for(var j=0; j<n; j++)
+			{
+				
+			}
+		}
+		
+		response.json(200, array);
 	}
 
 };

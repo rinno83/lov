@@ -349,3 +349,32 @@ exports.getTeamMemberRank = function(memberIndex, offset, limit, fn){
 		});
 	});
 };
+
+
+exports.getCurrentDongList = function(northWestLat, northWestLon, southEastLat, southEastLon, fn){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_GET_CURRENT_DONG('+northWestLat+', '+northWestLon+', '+southEastLat+', '+southEastLon+')', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			    else
+			    {
+				    return fn(err, JSON.stringify(rows[0]));
+			    }
+			});
+						    
+		});
+	});
+};

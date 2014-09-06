@@ -17,6 +17,7 @@ apiRoutes = function (server) {
 
 	// Land
 	server.post('/land/conquer', controller.http(controller.land.conquer));
+	server.get('/land/current', controller.http(controller.land.current));
 	
 	// Service
 	server.get('/service/version', controller.http(controller.service.version));
@@ -28,6 +29,8 @@ apiRoutes = function (server) {
 	// Team
 	server.get('/team/info', controller.http(controller.team.info));
 	server.get('/team/rank', controller.http(controller.team.rank));
+	
+	server.get('/member/code', controller.http(controller.member.code));	
 		
 };
 
