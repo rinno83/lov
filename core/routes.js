@@ -22,6 +22,7 @@ apiRoutes = function (server) {
 	// Service
 	server.get('/service/version', controller.http(controller.service.version));
 	server.post('/service/push_test', controller.http(controller.service.push_test));
+	server.post('/service/push', controller.http(controller.service.push));
 
 	// File
 	server.post('/upload/complete', controller.http(controller.upload.complete));

@@ -84,7 +84,10 @@ service = {
 		console.log('send push');
 		var resData = {};
 		
-		mysql_manager.getMemberToken(4, function(err, mysqlResult){
+		var title = '잠시 후 게임이 리셋 됩니다.';
+		var content = '안녕하세요. LOV운영자 정창현입니다. 잠시 후 게임이 리셋될 예정입니다. 한주동안 수고하셨습니다.';
+		
+		mysql_manager.getMemberToken(10, function(err, mysqlResult){
 			if(err)
 			{
 				resData.result = 10;
@@ -95,7 +98,35 @@ service = {
 			else
 			{
 				var dbData = JSON.parse(mysqlResult);
-				push_manager.sendAPNS(dbData[0].pushToken);
+				push_manager.sendAPNS(dbData[0].pushToken, title, content);
+				
+				response.json(200, resData);
+			}
+		});		
+	},
+	
+	
+	push : function push(response, body, options) {
+		
+		console.log('send push');
+		var resData = {};
+		
+		var memberIndex = body.memberIndex;
+		var title = body.title;
+		var content = body.content;
+		
+		mysql_manager.getMemberToken(memberIndex, function(err, mysqlResult){
+			if(err)
+			{
+				resData.result = 10;
+				resData.resultmessage = '서버 getMemberToken() 오류';
+				
+				response.json(500, resData);
+			}
+			else
+			{
+				var dbData = JSON.parse(mysqlResult);
+				push_manager.sendAPNS(dbData[0].pushToken, title, content);
 				
 				response.json(200, resData);
 			}
