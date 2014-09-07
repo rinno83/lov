@@ -75,9 +75,11 @@ land = {
 							if(resArray.spearUpdateDate != undefined)
 							{
 								//var startDate = moment(resArray.spearUpdateDate).zone(-9);
-								var startDate = moment(resArray.spearUpdateDate);
 								//var endDate = moment();
+								
+								var startDate = moment(resArray.spearUpdateDate).zone(9);
 								var endDate = moment().zone(-9);
+								
 								var secondsDiff = endDate.diff(startDate, 'seconds');
 								console.log(startDate);
 								console.log(endDate);
