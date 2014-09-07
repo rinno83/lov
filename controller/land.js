@@ -65,7 +65,7 @@ land = {
 						else
 						{
 							var dbData = JSON.parse(mysqlResult);
-							//console.log(dbData);
+							console.log(dbData);
 							
 							var resArray = dbData[0];
 							var spearCount = 5;
@@ -77,6 +77,8 @@ land = {
 								var startDate = moment(resArray.spearUpdateDate).zone(-9);
 								var endDate = moment();
 								var secondsDiff = endDate.diff(startDate, 'seconds');
+								console.log(startDate);
+								console.log(endDate);
 								console.log(secondsDiff);
 								
 								if(secondsDiff > 600)
