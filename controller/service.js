@@ -58,7 +58,7 @@ service = {
 					var dbData = JSON.parse(mysqlResult);
 					var resArray = dbData[0];
 					
-					resArray.landDBFileUrl = 'http://54.178.134.74/files/tb_land.sqlite';
+					resArray.landDBFileUrl = 'http://54.64.38.36/files/tb_land.sqlite';
 					
 					resData.resultCode = 1;
 					resData.resultmessage = '성공';

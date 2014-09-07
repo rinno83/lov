@@ -52,6 +52,12 @@
 	*        "resultCode": 15,
 	*	     "resultMessage": "실패"
 	*     }
+	* @apiErrorExample NOTENOUGH Error-Response:
+	*     HTTP/1.1 500 NOTENOUGH Error
+	*     {
+	*        "resultCode": 16,
+	*	     "resultMessage": "창이 없음"
+	*     }
 	*/
 
 

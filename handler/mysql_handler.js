@@ -151,7 +151,7 @@ exports.upsertMemberFriends = function(memberIndex, friends, friendType){
 
 
 
-exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon){
+exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
@@ -168,6 +168,10 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon){
 			    if(err)
 			    {
 				    throw err;
+			    }
+			    else
+			    {
+				    return fn(err, 1);
 			    }
 			});
 						    
@@ -186,6 +190,31 @@ exports.setMemberTeam = function(memberIndex){
 		connection.query('USE doogoon_lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_SET_MEMBER_TEAM('+memberIndex+')', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			});
+						    
+		});
+	});
+};
+
+
+exports.updateSpearInfo = function(memberIndex, spearCount, spearUpdateDate){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_UPDATE_SPEAR_INFO('+memberIndex+', '+spearCount+', "'+spearUpdateDate+'")', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		

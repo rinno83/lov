@@ -302,7 +302,7 @@ member = {
 							
 							if(resArray.spearUpdateDate != undefined)
 							{
-								var startDate = moment(resArray.spearUpdateDate, 'YYYY-M-DD HH:mm:ss');
+								var startDate = moment(resArray.spearUpdateDate).zone(-9);;
 								var endDate = moment();
 								var secondsDiff = endDate.diff(startDate, 'seconds');
 								
