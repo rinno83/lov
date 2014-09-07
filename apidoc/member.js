@@ -98,6 +98,7 @@
 	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
 	* @apiSuccess {String} data.title  Member 칭호.	
 	* @apiSuccess {Int} data.teamIndex  Member Team Index.	
+	* @apiSuccess {Int} data.conquerCount  Member Conquer Land Count.	
 	*
 	*
 	* @apiSuccessExample Success-Response:
@@ -112,7 +113,8 @@
 	*	        "introduce": "안녕하세요. Heesu Kim입니다.",
 	*	        "spearCount": 5,
 	*	        "title": "시민",
-	*	        "teamIndex": 1
+	*	        "teamIndex": 1,
+	*	        "conquerCount": 1,
 	*	        "spearRemainTime": 0
 	*	    }
 	*	  }

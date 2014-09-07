@@ -7,6 +7,7 @@ var when				= require('when'),
 	mongodb_manager	= require('../handler/mongodb_handler'),
 	token_manager	= require('../handler/token_handler'),
 	team_manager	= require('../handler/team_handler'),
+	push_manager	= require('../handler/push_handler'),
 	methodOverride	= require("method-override"),
 	querystring		= require("querystring"),
 	path			= require("path"),
@@ -97,13 +98,10 @@ land = {
 							}
 							
 							console.log(spearCount);
-							console.log(saveBulletUpdateTime);
 							
 							if(spearCount > 0)
 							{
-								console.log(saveBulletUpdateTime);
-								var temp01 = saveBulletUpdateTime;
-								mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon, function(err, mysqlResult){
+								mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon, function(err, mysqlResult2){
 									if(err)
 									{
 										resData.resultCode = 10;				
@@ -113,8 +111,6 @@ land = {
 									}
 									else
 									{
-										console.log(saveBulletUpdateTime);
-										console.log(temp01);
 										if(spearCount == 5)
 										{
 											var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -123,7 +119,8 @@ land = {
 										}
 										else
 										{
-											mysql_manager.updateSpearInfo(memberIndex, spearCount - 1, saveBulletUpdateTime);
+											console.log(saveBulletUpdateTime);
+											mysql_manager.updateSpearInfo(memberIndex, spearCount - 1, (saveBulletUpdateTime != null)?saveBulletUpdateTime.format('YYYY-MM-DD HH:mm:ss'):null);
 										}
 										
 										mongodb_manager.getLastConquerMemberIndex('conquer.log', landIndex, function(err, mongoResult){
@@ -138,6 +135,26 @@ land = {
 											{
 												if(mongoResult.length > 0)
 												{
+													// 정복 당했습니다. 푸시 전송
+													mysql_manager.getPushInfo(memberIndex, mongoResult[0].memberIndex, function(err, mysqlResult2) {
+														if(err)
+														{
+															resData.resultCode = 10;				
+															resData.resultmessage = 'Mysql getPushInfo() 오류';	
+															
+															response.json(500, resData);
+														}
+														else
+														{
+															var dbData2 = JSON.parse(mysqlResult2);
+															
+															push_manager.sendAPNS(dbData2[0].pushToken, '회원님의 땅이 '+dbData2[0].nickname+'님에게 정복당했습니다.', '');													
+														}
+														
+													});
+													
+													
+													// 정복 한 사람 업데이트
 													mongodb_manager.updateConquerNextMemberIndex('conquer.log', memberIndex, mongoResult[0]._id, function(err, updateResult){
 														if(err)
 														{

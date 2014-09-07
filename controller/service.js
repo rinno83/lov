@@ -115,10 +115,6 @@ service = {
 		var title = body.title;
 		var content = body.content;
 		
-		console.log(memberIndex);
-		console.log(title);
-		console.log(content);
-		
 		mysql_manager.getMemberToken(memberIndex, function(err, mysqlResult){
 			if(err)
 			{
@@ -130,7 +126,6 @@ service = {
 			else
 			{
 				var dbData = JSON.parse(mysqlResult);
-				console.log(dbData);
 				push_manager.sendAPNS(dbData[0].pushToken, title, content);
 				
 				response.json(200, resData);

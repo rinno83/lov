@@ -1,4 +1,6 @@
-var mongodb = require("mongodb");
+var mongodb = require("mongodb"),
+	moment 			= require('moment');
+
 var config = require('../core/configuration/index.js')
 
 var MongoClient = require('mongodb').MongoClient;
@@ -6,7 +8,8 @@ var MongoClient = require('mongodb').MongoClient;
 exports.insertMemberConquerLog = function(collection_name, memberIndex, landIndex, nextConquerMemberIndex, lat, lon) {
 	MongoClient.connect(config().mongodb.url, function(err, db) {
 		
-		var currentDate = new Date().getTime();
+		console.log(moment().format('X'));
+		var currentDate = moment().format('X');
 		db.collection(collection_name).insert({'memberIndex':memberIndex, 'landIndex':landIndex, 'nextConquerMemberIndex':nextConquerMemberIndex, 'lat':lat, 'lon':lon, 'registDate':currentDate}, function(err, result) {
 			if(err)
 			{
