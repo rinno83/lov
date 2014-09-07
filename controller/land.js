@@ -120,7 +120,8 @@ land = {
 									{
 										if(spearCount == 5)
 										{
-											var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+											//var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+											var currentDate = moment().zone(-9).format('YYYY-MM-DD HH:mm:ss');
 											//console.log(currentDate);
 											mysql_manager.updateSpearInfo(memberIndex, spearCount - 1, currentDate);
 										}
