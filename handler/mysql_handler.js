@@ -171,7 +171,7 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, fn){
 			    }
 			    else
 			    {
-				    return fn(err, 1);
+				    return fn(err, JSON.stringify(rows[0]));
 			    }
 			});
 						    
