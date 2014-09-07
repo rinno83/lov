@@ -80,7 +80,8 @@ land = {
 								var startDate = moment(resArray.spearUpdateDate).zone(-9);
 								var endDate = moment();
 								
-								var secondsDiff = endDate.diff(startDate, 'seconds');
+								//var secondsDiff = endDate.diff(startDate, 'seconds');
+								var secondsDiff = startDate.diff(endDate, 'seconds');
 								console.log(startDate);
 								console.log(endDate);
 								console.log(secondsDiff);
