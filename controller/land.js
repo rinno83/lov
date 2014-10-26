@@ -138,7 +138,7 @@ land = {
 												else
 												{
 													var dbData4 = JSON.parse(mysqlResult3);
-													var balance = dbData4[0].balance;
+													var balance = dbData4[0].balance; // 잔액
 													
 													// 해당 땅을 가장 최근에 먹었던 사용자 가져오기
 													mongodb_manager.getLastConquerMemberIndex('conquer.log', landIndex, function(err, mongoResult){
@@ -202,6 +202,13 @@ land = {
 												
 												resData.resultCode = 1;
 												resData.resultmessage = '성공';
+												resData.data = {
+													"memberIndex": memberIndex,
+											        "teamIndex": dbData[0].teamIndex,
+											        "landIndex": landIndex,
+											        "profileImageUrl": dbData[0].profileImageUrl,
+											        "nickname": dbData[0].nickname
+												};
 												
 												response.json(200, resData);
 												}
