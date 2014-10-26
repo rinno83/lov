@@ -11,7 +11,7 @@ exports.insertMember = function(socialId, nick, profileImageUrl, introduce, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_INSERT_MEMBER("'+socialId+'", "'+nick+'", "'+profileImageUrl+'", "'+introduce+'")', function(err, rows, fields) {
 				// And done with the connection.
@@ -26,8 +26,7 @@ exports.insertMember = function(socialId, nick, profileImageUrl, introduce, fn){
 			    {
 				    return fn(err, JSON.stringify(rows[0]));
 			    }
-			});
-						    
+			});			    
 		});
 	});
 };
@@ -40,7 +39,7 @@ exports.updateMemberInfo = function(memberIndex, nick, profileImageUrl, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_UPDATE_MEMBER_INFO('+memberIndex+', "'+nick+'", "'+profileImageUrl+'")', function(err, rows, fields) {
 				// And done with the connection.
@@ -69,7 +68,7 @@ exports.setMemberDevice = function(memberIndex, uuid, device, pushToken, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_SET_MEMBER_DEVICE('+memberIndex+', "'+uuid+'", "'+device+'", "'+pushToken+'")', function(err, rows, fields) {
 				// And done with the connection.
@@ -98,7 +97,7 @@ exports.getMemberInfo = function(memberIndex, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_MEMBER_INFO('+memberIndex+')', function(err, rows, fields) {
 				// And done with the connection.
@@ -127,7 +126,7 @@ exports.upsertMemberFriends = function(memberIndex, friends, friendType){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('REPLACE INTO tb_member_friend(memberIndex, friendIndex) SELECT '+memberIndex+' AS memberIndex, memberIndex AS friendIndex FROM tb_member WHERE socialId IN ( '+friends+' );', function(err, rows, fields) {
 				// And done with the connection.
@@ -158,7 +157,7 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_SET_MEMBER_LAND_CONQUER('+memberIndex+', '+landIndex+', '+lat+', '+lon+')', function(err, rows, fields) {
 				// And done with the connection.
@@ -180,16 +179,16 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, fn){
 };
 
 
-exports.setMemberTeam = function(memberIndex){
+exports.setMemberTeam = function(memberIndex, teamIndex){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL USP_SET_MEMBER_TEAM('+memberIndex+')', function(err, rows, fields) {
+			connection.query('CALL USP_SET_MEMBER_TEAM('+memberIndex+', '+teamIndex+')', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		
@@ -212,7 +211,7 @@ exports.updateSpearInfo = function(memberIndex, spearCount, spearUpdateDate){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_UPDATE_SPEAR_INFO('+memberIndex+', '+spearCount+', "'+spearUpdateDate+'")', function(err, rows, fields) {
 				// And done with the connection.
@@ -242,7 +241,7 @@ exports.getServiceVersion = function(serviceIndex, device, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_SERVICE_VERSION('+serviceIndex+', "'+device+'")', function(err, rows, fields) {
 				// And done with the connection.
@@ -271,7 +270,7 @@ exports.getTeamInfo = function(fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_TEAM_INFO()', function(err, rows, fields) {
 				// And done with the connection.
@@ -300,7 +299,7 @@ exports.getMemberToken = function(memberIndex, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_MEMBER_TOKEN('+memberIndex+')', function(err, rows, fields) {
 				// And done with the connection.
@@ -322,6 +321,32 @@ exports.getMemberToken = function(memberIndex, fn){
 };
 
 
+
+exports.setMemberToken = function(memberIndex, memberToken){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_SET_MEMBER_TOKEN('+memberIndex+', "'+memberToken+'")', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			});
+						    
+		});
+	});
+};
+
+
 exports.getMemberRank = function(offset, limit, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
@@ -329,7 +354,7 @@ exports.getMemberRank = function(offset, limit, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_MEMBER_RANK('+offset+', '+limit+')', function(err, rows, fields) {
 				// And done with the connection.
@@ -358,7 +383,7 @@ exports.getTeamMemberRank = function(memberIndex, offset, limit, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_TEAM_MEMBER_RANK('+memberIndex+', '+offset+', '+limit+')', function(err, rows, fields) {
 				// And done with the connection.
@@ -387,7 +412,7 @@ exports.getCurrentDongList = function(northWestLat, northWestLon, southEastLat, 
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_CURRENT_DONG('+northWestLat+', '+northWestLon+', '+southEastLat+', '+southEastLon+')', function(err, rows, fields) {
 				// And done with the connection.
@@ -418,7 +443,7 @@ exports.getPushInfo = function(memberIndex, conqueredMemberIndex, fn){
 			throw err;
 		}
 		
-		connection.query('USE doogoon_lov_db', function(err, rows, fields){
+		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_CONQUER_INFO('+memberIndex+', '+conqueredMemberIndex+')', function(err, rows, fields) {
 				// And done with the connection.

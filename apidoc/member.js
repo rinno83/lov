@@ -55,30 +55,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //																							   //
-//									Member Friend Sync										   //
-//																							   //
-/////////////////////////////////////////////////////////////////////////////////////////////////	
-
-	/**
-	* @api {put} /friend/sync 회원 친구 동기화
-	* @apiName 회원 친구 동기화
-	* @apiGroup Member
-	*
-	*
-	* @apiParam {String} friends Member Social Friends [ ex) socialId01,socialId02,socialId03,...  ].
-	*
-	*
-	* @apiSuccessExample Success-Response:
-	*     HTTP/1.1 200 OK
-	*	  {
-	*	     "resultCode": 1,
-	*	     "resultMessage": "성공"
-	*	  }
-	*
-	*/
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//																							   //
 //									Member Info												   //
 //																							   //
 /////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -94,8 +70,6 @@
 	* @apiSuccess {String} data.nickname  Member Nickname.	
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
 	* @apiSuccess {String} data.introduce  Member 소개글.	
-	* @apiSuccess {Int} data.spearCount  Member Spear Count.	
-	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
 	* @apiSuccess {String} data.title  Member 칭호.	
 	* @apiSuccess {Int} data.teamIndex  Member Team Index.	
 	* @apiSuccess {Int} data.conquerCount  Member Conquer Land Count.	
@@ -111,11 +85,9 @@
 	*	        "nickname": "doogoon",
 	*	        "profileImageUrl": "",
 	*	        "introduce": "안녕하세요. Heesu Kim입니다.",
-	*	        "spearCount": 5,
 	*	        "title": "시민",
 	*	        "teamIndex": 1,
 	*	        "conquerCount": 1,
-	*	        "spearRemainTime": 0
 	*	    }
 	*	  }
 	*
@@ -143,8 +115,6 @@
 	* @apiSuccess {String} data.socialId  Member Social ID.	
 	* @apiSuccess {String} data.nickname  Member Nickname.	
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
-	* @apiSuccess {Int} data.spearCount  Member Spear Count.	
-	* @apiSuccess {Int} data.spearRemainTime  Member Spear Remain Time.	
 	* @apiSuccess {String} data.title  Member 칭호.	
 	* @apiSuccess {String} data.teamName  Member Team Name.	
 	* @apiSuccess {String} data.teamImageUrl  Member Team Image URL.	
@@ -159,11 +129,9 @@
 	*	        "socialId": "12345678913",
 	*	        "nickname": "doogoon01",
 	*	        "profileImageUrl": "",
-	*	        "spearCount": 5,
 	*	        "title": "시민",
 	*	        "teamName": "RED",
 	*	        "teamImageUrl": "http://54.178.134.74/files/red_team.jpg",
-	*	        "spearRemainTime": 0
 	*	    }
 	*	  }
 	*
