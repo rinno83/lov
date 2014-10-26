@@ -78,7 +78,7 @@ land = {
 								resData.resultCode = 16;				
 								resData.resultmessage = '투자할 금액이 부족합니다.';
 								
-								response.json(500, resData);
+								response.json(400, resData);
 							}
 							else
 							{
@@ -117,7 +117,7 @@ land = {
 													resData.resultCode = 17;				
 													resData.resultmessage = '현 시세보다 투자한 금액이 적습니다.';
 													
-													response.json(500, resData);
+													response.json(400, resData);
 												}												
 											});											
 										}
@@ -300,7 +300,7 @@ land = {
 			{
 				clearInterval(this.timer);
 			}			
-		}, 1000);
+		}, 1000, tempValue);
 		
 	},
 	

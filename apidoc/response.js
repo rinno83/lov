@@ -53,13 +53,13 @@
 	*	     "resultMessage": "실패"
 	*     }
 	* @apiErrorExample NOTENOUGH Error-Response:
-	*     HTTP/1.1 500 NOTENOUGH Error
+	*     HTTP/1.1 400 NOTENOUGH Error
 	*     {
 	*        "resultCode": 16,
 	*	     "resultMessage": "창이 없음"
 	*     }
 	* @apiErrorExample LACKMONEY Error-Response:
-	*     HTTP/1.1 500 LACKMONEY Error
+	*     HTTP/1.1 400 LACKMONEY Error
 	*     {
 	*        "resultCode": 17,
 	*	     "resultMessage": "현 시세보다 투자금액이 적습니다."
