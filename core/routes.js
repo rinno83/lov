@@ -8,7 +8,6 @@ apiRoutes = function (server) {
 	// Member
 	server.post('/member/social', controller.http(controller.member.social));
 	server.get('/member/token', controller.http(controller.member.token));
-	server.put('/friend/sync', controller.http(controller.member.friend_sync));
 	server.get('/member/info', controller.http(controller.member.info));
 	server.put('/member/info', controller.http(controller.member.info_update));
 	server.get('/member/logout', controller.http(controller.member.logout));
@@ -18,6 +17,8 @@ apiRoutes = function (server) {
 	// Land
 	server.post('/land/conquer', controller.http(controller.land.conquer));
 	server.get('/land/current', controller.http(controller.land.current));
+	server.get('/land/start', controller.http(controller.land.start_test));
+	server.get('/land/end', controller.http(controller.land.end_test));
 	
 	// Service
 	server.get('/service/version', controller.http(controller.service.version));

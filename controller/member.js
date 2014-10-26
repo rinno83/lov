@@ -145,8 +145,6 @@ member = {
 									}
 								});
 								
-								
-								
 								// Response
 								var resArray = {
 									'token':memberToken

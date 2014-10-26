@@ -15,6 +15,7 @@ var when				= require('when'),
 	crypto 			= require("crypto"),
 	dateformat 		= require("dateformat"),
 	moment 			= require('moment'),
+	timer			= null,
 	land;
 	
 
@@ -30,7 +31,7 @@ land = {
 		console.log('conquer');
 		var resData = {};
 		
-		if(body.token != null && body.uuid != null && body.device != null && body.landIndex != null && body.lat != null && body.lon != null)
+		if(body.token != null && body.uuid != null && body.device != null && body.landIndex != null && body.lat != null && body.lon != null && body.investMoney != null)
 		{
 			var token = body.token;
 			var uuid = body.uuid;
@@ -39,6 +40,8 @@ land = {
 			var landIndex = body.landIndex;
 			var lat = body.lat;
 			var lon = body.lon;
+			var investMoney = parseInt(body.investMoney);
+			var battingMoney = 100;
 			
 			var redisKey = util.getMemberTokenKey(device, token);
 			var redisInstance = new redis_manager(config().redis);
@@ -54,6 +57,7 @@ land = {
 				{
 					var memberIndex = reply;
 					
+					// 사용자 정보 가져오기
 					mysql_manager.getMemberInfo(memberIndex, function(err, mysqlResult) {
 						if(err)
 						{
@@ -68,47 +72,18 @@ land = {
 							console.log(dbData);
 							
 							var resArray = dbData[0];
-							var spearCount = 5;
-							var	spearReaminTime = 0;
-							var saveBulletUpdateTime = null;
 							
-							if(resArray.spearUpdateDate != undefined)
+							if(resArray.money <= battingMoney)
 							{
-								var startDate = moment(resArray.spearUpdateDate).zone(-9);
-								var endDate = moment();
+								resData.resultCode = 16;				
+								resData.resultmessage = '투자할 금액이 부족합니다.';
 								
-								//var startDate = moment(resArray.spearUpdateDate).zone(18);
-								//var endDate = moment().zone(-9);
-								
-								var secondsDiff = endDate.diff(startDate, 'seconds');
-								
-								console.log(startDate);
-								console.log(endDate);
-								console.log(secondsDiff);
-								
-								if(secondsDiff > 600)
-								{
-									var times = parseInt(10 * Math.floor(secondsDiff / 600));
-									//console.log(times);
-									saveBulletUpdateTime = startDate.add(times, 'minutes');
-									console.log(saveBulletUpdateTime.format('YYYY-MM-DD HH:mm:ss'));
-								}
-								
-								spearCount = resArray.spearCount + Math.floor(secondsDiff / 600);
-								spearReaminTime = 600 - (secondsDiff % 600);
-								
-								if(spearCount >= 5)
-								{
-									spearCount = 5;
-									spearReaminTime = 0;
-								}
+								response.json(500, resData);
 							}
-							
-							console.log(spearCount);
-							
-							if(spearCount > 0)
+							else
 							{
-								mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon, function(err, mysqlResult2){
+								// 사용자 땅 정복 저장
+								mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon, investMoney, function(err, mysqlResult2){
 									if(err)
 									{
 										resData.resultCode = 10;				
@@ -127,89 +102,114 @@ land = {
 											
 											response.json(400, resData);
 										}
-										else
+										else if(dbData3[0].result == 2)
 										{
-											if(spearCount == 5)
-											{
-												//var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
-												var currentDate = moment().zone(-9).format('YYYY-MM-DD HH:mm:ss');
-												//console.log(currentDate);
-												mysql_manager.updateSpearInfo(memberIndex, spearCount - 1, currentDate);
-											}
-											else
-											{
-												console.log(saveBulletUpdateTime);
-												mysql_manager.updateSpearInfo(memberIndex, spearCount - 1, (saveBulletUpdateTime != null)?saveBulletUpdateTime.format('YYYY-MM-DD HH:mm:ss'):null);
-											}
-											
-											mongodb_manager.getLastConquerMemberIndex('conquer.log', landIndex, function(err, mongoResult){
+											mysql_manager.setMemberMoney(memberIndex, battingMoney, function(err, mysqlResult3){
 												if(err)
 												{
-													resData.result = 10;
-													resData.resultmessage = '서버 getLastConquerMemberIndex 오류';
+													resData.resultCode = 10;				
+													resData.resultmessage = 'Mysql setMemberMoney() 오류';	
 													
 													response.json(500, resData);
 												}
 												else
 												{
-													if(mongoResult.length > 0)
+													resData.resultCode = 17;				
+													resData.resultmessage = '현 시세보다 투자한 금액이 적습니다.';
+													
+													response.json(500, resData);
+												}												
+											});											
+										}
+										else
+										{	
+											var totalInvestMoney = investMoney + battingMoney;
+											console.log('totalInvestMoney : ' + totalInvestMoney);
+											
+											// 사용자 돈 업데이트
+											mysql_manager.setMemberMoney(memberIndex, totalInvestMoney, function(err, mysqlResult3){
+												if(err)
+												{
+													resData.resultCode = 10;				
+													resData.resultmessage = 'Mysql setMemberMoney() 오류';	
+													
+													response.json(500, resData);
+												}
+												else
+												{
+													var dbData4 = JSON.parse(mysqlResult3);
+													var balance = dbData4[0].balance;
+													
+													// 해당 땅을 가장 최근에 먹었던 사용자 가져오기
+													mongodb_manager.getLastConquerMemberIndex('conquer.log', landIndex, function(err, mongoResult){
+													if(err)
 													{
-														// 정복 당했습니다. 푸시 전송
-														mysql_manager.getPushInfo(memberIndex, mongoResult[0].memberIndex, function(err, mysqlResult2) {
-															if(err)
-															{
-																resData.resultCode = 10;				
-																resData.resultmessage = 'Mysql getPushInfo() 오류';	
-																
-																response.json(500, resData);
-															}
-															else
-															{
-																var dbData2 = JSON.parse(mysqlResult2);
-																
-																push_manager.sendAPNS(dbData2[0].pushToken, '회원님의 땅이 '+dbData2[0].nickname+'님에게 정복당했습니다.', '');													
-															}
-															
-														});
+														resData.result = 10;
+														resData.resultmessage = '서버 getLastConquerMemberIndex 오류';
 														
-														
-														// 정복 한 사람 업데이트
-														mongodb_manager.updateConquerNextMemberIndex('conquer.log', memberIndex, mongoResult[0]._id, function(err, updateResult){
-															if(err)
-															{
-																resData.result = 10;
-																resData.resultmessage = '서버 updateConquerNextMemberIndex 오류';
-																
-																response.json(500, resData);
-															}
-															else
-															{
-																mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
-															}
-														});
+														response.json(500, resData);
 													}
 													else
 													{
-														mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+														console.log(mongoResult);
+														if(mongoResult.length > 0)
+														{
+															// 정복 당했습니다. 푸시 전송
+															mysql_manager.getPushInfo(memberIndex, mongoResult[0].memberIndex, function(err, mysqlResult2) {
+																if(err)
+																{
+																	resData.resultCode = 10;				
+																	resData.resultmessage = 'Mysql getPushInfo() 오류';	
+																	
+																	response.json(500, resData);
+																}
+																else
+																{
+																	var dbData2 = JSON.parse(mysqlResult2);
+																	var messageData= {};
+																	messageData.token = dbData2[0].pushToken;
+																	messageData.badge_count = 1;
+																	messageData.alert_message = '회원님의 땅이 '+dbData2[0].nickname+'님에게 정복당했습니다.';
+																	messageData.payload = {'message': ''};
+																	
+																	push_manager.push_queue('PUSH_APNS_TASK_QUEUE', messageData);
+																}
+																
+															});
+															
+															
+															// 정복 한 사람 업데이트
+															mongodb_manager.updateConquerNextMemberIndex('conquer.log', memberIndex, mongoResult[0]._id, function(err, updateResult){
+																if(err)
+																{
+																	resData.result = 10;
+																	resData.resultmessage = '서버 updateConquerNextMemberIndex 오류';
+																	
+																	response.json(500, resData);
+																}
+																else
+																{
+																	mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+																}
+															});
+														}
+														else
+														{
+															mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+														}
 													}
+												});
+												
+												resData.resultCode = 1;
+												resData.resultmessage = '성공';
+												
+												response.json(200, resData);
 												}
-											});
-											
-											resData.resultCode = 1;
-											resData.resultmessage = '성공';
-											
-											response.json(200, resData);
+											});											
 										}
 									}
 								});
-							}
-							else
-							{
-								resData.resultCode = 16;				
-								resData.resultmessage = '창이 없음';	
-								
-								response.json(400, resData);
-							}
+							}							
 						}
 						
 					});					
@@ -284,6 +284,29 @@ land = {
 			
 			response.json(400, resData);
 		}
+		
+	},
+	
+	start_test : function start_test(response, body, options) {
+		var tempValue = options.temp;
+		console.log(tempValue);
+		
+		this.timer = setInterval(function() {
+			if(tempValue)
+			{
+				console.log('world');
+			}
+			else
+			{
+				clearInterval(this.timer);
+			}			
+		}, 1000);
+		
+	},
+	
+	end_test : function end_test(response, body, options) {
+		
+		clearInterval(this.timer);
 		
 	}
 

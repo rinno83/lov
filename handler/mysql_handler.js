@@ -1,5 +1,5 @@
 var mysql = require("mysql");
-var config = require('../core/configuration/index.js')
+var config = require('../core/configuration/index.js');
 
 var pool = mysql.createPool(config().database);
 
@@ -150,7 +150,7 @@ exports.upsertMemberFriends = function(memberIndex, friends, friendType){
 
 
 
-exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, fn){
+exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, investMoney, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
@@ -159,7 +159,40 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, fn){
 		
 		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL USP_SET_MEMBER_LAND_CONQUER('+memberIndex+', '+landIndex+', '+lat+', '+lon+')', function(err, rows, fields) {
+			connection.query('CALL USP_SET_MEMBER_LAND_CONQUER('+memberIndex+', '+landIndex+', '+lat+', '+lon+', '+investMoney+')', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			    else
+			    {
+				    return fn(err, JSON.stringify(rows[0]));
+			    }
+			});
+						    
+		});
+	});
+};
+
+
+
+
+
+
+exports.setMemberMoney = function(memberIndex, totalInvestMoney, fn){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_SET_MEMBER_MONEY('+memberIndex+', '+totalInvestMoney+')', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		

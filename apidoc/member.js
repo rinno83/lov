@@ -71,6 +71,7 @@
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
 	* @apiSuccess {String} data.introduce  Member 소개글.	
 	* @apiSuccess {String} data.title  Member 칭호.	
+	* @apiSuccess {Int} data.money  Member Money.	
 	* @apiSuccess {Int} data.teamIndex  Member Team Index.	
 	* @apiSuccess {Int} data.conquerCount  Member Conquer Land Count.	
 	*
@@ -86,6 +87,7 @@
 	*	        "profileImageUrl": "",
 	*	        "introduce": "안녕하세요. Heesu Kim입니다.",
 	*	        "title": "시민",
+	*	        "money": 0,
 	*	        "teamIndex": 1,
 	*	        "conquerCount": 1,
 	*	    }
@@ -103,7 +105,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	/**
-	* @api {put} /member/info/update 회원 정보 수정
+	* @api {put} /member/info 회원 정보 수정
 	* @apiName 회원 정보 수정
 	* @apiGroup Member
 	*
@@ -116,6 +118,7 @@
 	* @apiSuccess {String} data.nickname  Member Nickname.	
 	* @apiSuccess {String} data.profileImageUrl  Member Profile Image URL.	
 	* @apiSuccess {String} data.title  Member 칭호.	
+	* @apiSuccess {Int} data.money  Member Money.		
 	* @apiSuccess {String} data.teamName  Member Team Name.	
 	* @apiSuccess {String} data.teamImageUrl  Member Team Image URL.	
 	*
@@ -130,6 +133,7 @@
 	*	        "nickname": "doogoon01",
 	*	        "profileImageUrl": "",
 	*	        "title": "시민",
+	*	        "money": 0,	
 	*	        "teamName": "RED",
 	*	        "teamImageUrl": "http://54.178.134.74/files/red_team.jpg",
 	*	    }

@@ -58,6 +58,12 @@
 	*        "resultCode": 16,
 	*	     "resultMessage": "창이 없음"
 	*     }
+	* @apiErrorExample LACKMONEY Error-Response:
+	*     HTTP/1.1 500 LACKMONEY Error
+	*     {
+	*        "resultCode": 17,
+	*	     "resultMessage": "현 시세보다 투자금액이 적습니다."
+	*     }	
 	*/
 
 

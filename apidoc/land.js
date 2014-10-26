@@ -12,6 +12,7 @@
 	* @apiParam {String} landIndex Land Index.
 	* @apiParam {String} lat Current Member Location Latitude.
 	* @apiParam {String} lon Current Member Location Longitude.
+	* @apiParam {Int} investMoney Member Invest Money.
 	*
 	*
 	* @apiSuccessExample Success-Response:

@@ -101,6 +101,9 @@ http = function (apiMethod) {
 		var object = req.body,
 			options = {};	
 		
+		console.log(req.headers);
+		console.log(object);
+		
 		object.uuid = req.headers.uuid;
 		object.device = req.headers.device;
 		object.query = req.query;

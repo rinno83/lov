@@ -29,7 +29,10 @@ config = {
 			host : '127.0.0.1',
 			port : '27017',
 			db : 'doogoon_lov_log'
-		}
+		},
+		rabbit: {
+			connect : 'amqp://admin:superapp5!@54.64.38.36:5672'
+		},
 	},
 
 	// ### Production
@@ -61,7 +64,10 @@ config = {
 			host : '127.0.0.1',
 			port : '27017',
 			db : 'doogoon_lov_log'
-		}
+		},
+		rabbit: {
+			connect : 'amqp://admin:superapp5!@54.64.38.36:5672'
+		},
 	}
 };
 
