@@ -13,16 +13,18 @@ apiRoutes = function (server) {
 	server.get('/member/logout', controller.http(controller.member.logout));
 	server.get('/member/rank', controller.http(controller.member.rank));
 	server.get('/member/history', controller.http(controller.member.history));
+	server.post('/member/money/gatheringStart', controller.http(controller.member.moneyWalkGatheringStart));
+	server.post('/member/money/gathering', controller.http(controller.member.moneyWalkGathering));
+	server.post('/member/money/gatheringEnd', controller.http(controller.member.moneyWalkGatheringEnd));
 
 	// Land
 	server.post('/land/conquer', controller.http(controller.land.conquer));
 	server.get('/land/current', controller.http(controller.land.current));
-	server.get('/land/start', controller.http(controller.land.start_test));
-	server.get('/land/end', controller.http(controller.land.end_test));
+	server.get('/land/touch', controller.http(controller.land.touch));
 	
 	// Service
 	server.get('/service/version', controller.http(controller.service.version));
-	server.post('/service/push_test', controller.http(controller.service.push_test));
+	server.post('/service/reset', controller.http(controller.service.reset));
 	server.post('/service/push', controller.http(controller.service.push));
 
 	// File

@@ -591,8 +591,260 @@ member = {
 			response.json(400, resData);
 		}
 		
+	},
+	
+	
+	
+	moneyWalkGatheringStart: function moneyWalkGathering(response, body, options) {
+		
+		//console.log('login');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null && body.lat != null && body.lon != null && body.updateDate != null)
+		{
+			var token = body.token;
+			var uuid = body.uuid;
+			var device = body.device;
+			
+			var lat = body.lat;
+			var lon = body.lon;
+			var money = 0;
+			var updateDate = body.updateDate;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
+				{
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
+					
+					response.json(400, resData);
+				}
+				else
+				{
+					var memberIndex = reply;
+					mongodb_manager.insertMemberWalkGatheringLog('gatheringMoney.log', memberIndex, lat, lon, money, updateDate, function(err, insertMemberWalkGatheringLogResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 insertMemberWalkGatheringLog() 오류';
+							
+							response.json(400, resData);
+						}
+						else
+						{
+							resData.resultCode = 1;
+							resData.resultmessage = '성공';
+							resData.data = {
+								gatheringKey: insertMemberWalkGatheringLogResult[0]._id,
+								money: 0
+							};
+							
+							response.json(200, resData);
+						}
+					});
+				}
+			});
+		}
+		else {
+			resData.result = 11;
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
+	}, 
+	
+	moneyWalkGathering: function moneyWalkGathering(response, body, options) {
+		
+		//console.log('login');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null && body.gatheringKey != null && body.lat != null && body.lon != null && body.updateDate != null)
+		{
+			var token = body.token;
+			var uuid = body.uuid;
+			var device = body.device;
+			
+			var gatheringKey = body.gatheringKey;
+			var lat = body.lat;
+			var lon = body.lon;
+			var updateDate = body.updateDate;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
+				{
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
+					
+					response.json(400, resData);
+				}
+				else
+				{
+					var memberIndex = reply;
+					console.log(gatheringKey);
+					
+					mongodb_manager.getMemberWalkGatheringLog('gatheringMoney.log', memberIndex, gatheringKey, function(err, mongoResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 getMemberHistory() 오류';
+							
+							response.json(400, resData);
+						}
+						else
+						{
+							var c = new Date(updateDate);
+							var u = new Date(mongoResult[0].location[mongoResult[0].location.length - 1].updateDate);
+							
+							var second = (c - u) / 1000;
+							
+							if(second > 60)
+							{
+								resData.result = 15;
+								resData.resultmessage = '1분 이상 위치 신호를 받지 못했습니다.';
+								resData.data = {
+									gatheringKey: mongoResult[0]._id,
+									money: mongoResult[0].money
+								};
+								
+								response.json(400, resData);
+							}
+							else
+							{
+								var distance = util.getMeter(mongoResult[0].location[mongoResult[0].location.length - 1].lat, mongoResult[0].location[mongoResult[0].location.length - 1].lon, lat, lon);
+								var money = (distance * 10) + mongoResult[0].money;
+
+								mongodb_manager.updateMemberWalkGatheringLog('gatheringMoney.log', memberIndex, mongoResult[0]._id, lat, lon, money, updateDate);
+								
+								resData.resultCode = 1;
+								resData.resultmessage = '성공';
+								resData.data = {
+									gatheringKey: mongoResult[0]._id,
+									money: money
+								};
+								
+								response.json(200, resData);	
+							}
+						}
+					});
+				}
+			});
+		}
+		else {
+			resData.result = 11;
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
+	},
+	
+	
+	moneyWalkGatheringEnd: function moneyWalkGathering(response, body, options) {
+		
+		//console.log('login');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null && body.gatheringKey != null && body.lat != null && body.lon != null && body.updateDate != null)
+		{
+			var token = body.token;
+			var uuid = body.uuid;
+			var device = body.device;
+			
+			var gatheringKey = body.gatheringKey;
+			var lat = body.lat;
+			var lon = body.lon;
+			var updateDate = body.updateDate;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
+				{
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
+					
+					response.json(400, resData);
+				}
+				else
+				{
+					var memberIndex = reply;
+					console.log(gatheringKey);
+					
+					mongodb_manager.getMemberWalkGatheringLog('gatheringMoney.log', memberIndex, gatheringKey, function(err, mongoResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 getMemberHistory() 오류';
+							
+							response.json(400, resData);
+						}
+						else
+						{
+							var currentDate = new Date().getTime();
+							var c = new Date(currentDate);
+							var u = new Date(mongoResult[0].location[mongoResult[0].location.length - 1].updateDate);
+							
+							var second = (c - u) / 1000;
+							
+							if(second > 60)
+							{
+								resData.result = 15;
+								resData.resultmessage = '1분 이상 위치 신호를 받지 못했습니다.';
+								resData.data = {
+									gatheringKey: mongoResult[0]._id,
+									money: mongoResult[0].money
+								};
+								
+								response.json(400, resData);
+							}
+							else
+							{
+								var distance = util.getMeter(mongoResult[0].location[mongoResult[0].location.length - 1].lat, mongoResult[0].location[mongoResult[0].location.length - 1].lon, lat, lon);
+								var money = (distance * 10) + mongoResult[0].money;
+
+								mysql_manager.setMemberGatheringMoney(memberIndex, money, function(err, mysqlResult){
+									if(err)
+									{
+										resData.result = 10;
+										resData.resultmessage = '서버 setMemberGatheringMoney() 오류';
+										
+										response.json(400, resData);
+									}
+									else
+									{
+										mongodb_manager.updateMemberWalkGatheringLog('gatheringMoney.log', memberIndex, mongoResult[0]._id, lat, lon, money);
+								
+										resData.resultCode = 1;
+										resData.resultmessage = '성공';
+										resData.data = {
+											gatheringKey: mongoResult[0]._id,
+											money: money
+										};
+										
+										response.json(200, resData);
+									}
+								});									
+							}
+						}
+					});
+				}
+			});
+		}
+		else {
+			resData.result = 11;
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
 	}
 
 };
+
 
 module.exports = member;

@@ -1,5 +1,6 @@
-var mongodb = require("mongodb"),
-	moment 			= require('moment');
+var mongodb 		= require("mongodb"),
+	moment 			= require('moment'),
+	ObjectId 		= require('mongodb').ObjectID;
 
 var config = require('../core/configuration/index.js')
 
@@ -78,6 +79,62 @@ exports.getMemberHistory = function(collection_name, memberIndex, offset, limit,
 			}			
 		});
 
+	});
+};
+
+
+
+exports.getMemberWalkGatheringLog = function(collection_name, memberIndex, mongoId, fn) {
+	MongoClient.connect(config().mongodb.url, function(err, db) {
+		var currentDate = new Date().getTime();
+		db.collection(collection_name).find({'memberIndex':memberIndex, '_id':new ObjectId(mongoId)}).toArray(function(err, result) {
+			if(err)
+			{
+				throw err;
+			}
+			else
+			{
+				return fn(err, result);
+				
+				db.close();
+			}			
+		});
+
+	});
+};
+
+
+exports.insertMemberWalkGatheringLog = function(collection_name, memberIndex, lat, lon, money, updateDate, fn) {
+	MongoClient.connect(config().mongodb.url, function(err, db) {
+		
+		db.collection(collection_name).insert({'memberIndex':memberIndex, 'location':[{'lat':lat, 'lon':lon, 'updateDate':updateDate}], 'money':money}, function(err, result) {
+			if(err)
+			{
+				throw err;
+			}
+			else
+			{
+				return fn(err, result);
+				db.close();
+			}			
+		});
+	});
+};
+
+
+exports.updateMemberWalkGatheringLog = function(collection_name, memberIndex, mongoId, lat, lon, money, updateDate) {
+	MongoClient.connect(config().mongodb.url, function(err, db) {
+		
+		db.collection(collection_name).update({'memberIndex':memberIndex, '_id':mongoId}, {'$push':{'location':{'$each':[{'lat':lat, 'lon':lon, 'updateDate':updateDate}]}}, '$set':{'money':money}}, {upsert:true}, function(err, result) {
+			if(err)
+			{
+				throw err;
+			}
+			else
+			{
+				db.close();
+			}			
+		});
 	});
 };
 

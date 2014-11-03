@@ -13,7 +13,7 @@ var _             = require('lodash'),
 	util        = require('./util'),
 	mysql_manager	= require('../handler/mysql_handler'),	
 	redis_manager = require('../handler/redis_handler'),
-	winston 		= require("winston"),	
+	winston 		= require("winston"),
 	http,
 	formatHttpErrors,
 	loadController;
@@ -32,6 +32,11 @@ var logger = new (winston.Logger)({
 	exitOnError: false
 */
 });	
+
+
+
+
+
 
 /**
  * ### Format HTTP Errors

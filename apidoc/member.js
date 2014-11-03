@@ -291,3 +291,117 @@
 	*
 	*/	
 
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//								Member Walk Gathering Money Start							   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {post} /member/money/gatheringStart 돈 모으기 시작(걷기)
+	* @apiName 돈 모으기 시작(걷기)
+	* @apiGroup Member
+	*
+	*
+	* @apiParam {Timestamp} updateDate Current DateTime
+	* @apiParam {String} lat Current Member Location Latitude.
+	* @apiParam {String} lon Current Member Location Longitude.
+	*
+	*
+	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {Int} data.gatheringKey  Gathering Session Key.
+	* @apiSuccess {Int} data.money  Gathering Money.
+	*
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	  {
+	*	    "resultCode": 1,
+	*	    "resultmessage": "성공",
+	*	    "data": {
+	*	        "gatheringKey": "54510d9f660c0c0e0ba52ee8",
+	*	        "money": 2870
+	*	    }
+	*	}
+	*
+	*/	
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//								Member Walk Gathering Money 								   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {post} /member/money/gathering 돈 모으기 중(걷기)
+	* @apiName 돈 모으기 중(걷기)
+	* @apiGroup Member
+	*
+	*
+	* @apiParam {Timestamp} updateDate Current DateTime	
+	* @apiParam {Int} gatheringKey Gathering Session Key[init : '']
+	* @apiParam {String} lat Current Member Location Latitude.
+	* @apiParam {String} lon Current Member Location Longitude.
+	*
+	*
+	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {Int} data.gatheringKey  Gathering Session Key.
+	* @apiSuccess {Int} data.money  Gathering Money.
+	*
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	  {
+	*	    "resultCode": 1,
+	*	    "resultmessage": "성공",
+	*	    "data": {
+	*	        "gatheringKey": "54510d9f660c0c0e0ba52ee8",
+	*	        "money": 2870
+	*	    }
+	*	}
+	*
+	*/	
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//								Member Walk Gathering Money End								   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {post} /member/money/gatheringEnd 돈 모으기 종료(걷기)
+	* @apiName 돈 모으기 종료(걷기)
+	* @apiGroup Member
+	*
+	*
+	* @apiParam {Timestamp} updateDate Current DateTime	
+	* @apiParam {Int} gatheringKey Gathering Session Key[init : '']
+	* @apiParam {String} lat Current Member Location Latitude.
+	* @apiParam {String} lon Current Member Location Longitude.
+	*
+	*
+	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {Int} data.gatheringKey  Gathering Session Key.
+	* @apiSuccess {Int} data.money  Gathering Money.
+	*
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	  {
+	*	    "resultCode": 1,
+	*	    "resultmessage": "성공",
+	*	    "data": {
+	*	        "gatheringKey": "54510d9f660c0c0e0ba52ee8",
+	*	        "money": 2870
+	*	    }
+	*	}
+	*
+	*/	
+

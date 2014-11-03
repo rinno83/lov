@@ -12,7 +12,8 @@ var when				= require('when'),
 	path			= require("path"),
 	http  			= require("http"),
 	crypto 			= require("crypto"),
-	dateformat 		= require("dateformat"),
+	dateformat 		= require("dateformat"),	
+	sync			= require('sync'),
 	member;
 	
 
@@ -31,6 +32,7 @@ function get_reg_token_key(sid, token)
 {
 	return key_string = "REGIST::"+sid+"::"+token;
 }
+
 
 
 service = {
@@ -79,33 +81,6 @@ service = {
 	},
 	
 	
-	push_test : function push_test(response, body, options) {
-		
-		console.log('send push');
-		var resData = {};
-		
-		var title = '잠시 후 게임이 리셋 됩니다.';
-		var content = '안녕하세요. LOV운영자 정창현입니다. 잠시 후 게임이 리셋될 예정입니다. 한주동안 수고하셨습니다.';
-		
-		mysql_manager.getMemberToken(10, function(err, mysqlResult){
-			if(err)
-			{
-				resData.result = 10;
-				resData.resultmessage = '서버 getMemberToken() 오류';
-				
-				response.json(500, resData);
-			}
-			else
-			{
-				var dbData = JSON.parse(mysqlResult);
-				push_manager.sendAPNS(dbData[0].pushToken, title, content);
-				
-				response.json(200, resData);
-			}
-		});		
-	},
-	
-	
 	push : function push(response, body, options) {
 		
 		console.log('send push');
@@ -131,6 +106,97 @@ service = {
 				response.json(200, resData);
 			}
 		});		
+	},
+	
+	
+	reset : function reset(response, body, options) {
+		
+		console.log('reset!!');
+		var resData = {};
+				
+		mysql_manager.setItemWinner(function(err, mysqlResult){
+			if(err)
+			{
+				console.log('Mysql setItemWinner() Error!!');
+			}
+			else
+			{
+				var setItemWinnerResult = JSON.parse(mysqlResult);
+				console.log('result : ' + setItemWinnerResult[0].result);
+				
+				for(var i=0;i<setItemWinnerResult.length;i++)
+				{
+					var messageData= {};
+					var alertMessage = '';
+					
+					if(setItemWinnerResult[i].result == 1)
+					{
+						alertMessage = '축하합니다~ 회원님의 팀이 승리했습니다. 이번 시즌도 열심히 해보아요!!';
+					}
+					else if(setItemWinnerResult[i].result == 2)
+					{
+						alertMessage = '회원님의 팀이 패배했습니다. 이번 시즌에 더 열심히 해보아요!!';
+					}
+					else
+					{
+						alertMessage = '지난 시즌은 무승부입니다. 이번 시즌에는 이겨보아요!!';
+					}
+					
+					
+					messageData.token = setItemWinnerResult[i].pushToken;
+					messageData.badge_count = 1;
+					messageData.alert_message = alertMessage;
+					messageData.payload = {
+						'type': 'reset'
+					};
+
+					if(setItemWinnerResult[i].device == 'ANDROID')
+					{
+						push_manager.push_queue('PUSH_GCM_TASK_QUEUE', messageData);
+					}
+					else
+					{
+						push_manager.push_queue('PUSH_APNS_TASK_QUEUE', messageData);
+					}					
+											
+				}
+				
+				// Delete Member Team Info
+				mysql_manager.delMemberTeam(function(err, mysqlResult3){
+					if(err)
+					{
+						console.log('Mysql delMemberTeam() Error!!');
+					}
+					else
+					{
+						// Delete Conquer Info
+						mysql_manager.delMemberConquer(function(err, mysqlResult4){
+							if(err)
+							{
+								console.log('Mysql deleMemberConquer() Error!!');
+							}
+							else
+							{
+								// Delete Conquer Info
+								mysql_manager.initMemberTeam(function(err, mysqlResult4){
+									if(err)
+									{
+										console.log('Mysql initMemberTeam() Error!!');
+									}
+								});
+							}
+						});
+						
+						
+					}
+				});
+				
+				resData.result = 1;
+				resData.resultmessage = '성공';
+				
+				response.json(200, resData);
+			}
+		});	
 	}
 
 };

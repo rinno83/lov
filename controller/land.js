@@ -16,6 +16,7 @@ var when				= require('when'),
 	dateformat 		= require("dateformat"),
 	moment 			= require('moment'),
 	timer			= null,
+	job				= null,
 	land;
 	
 
@@ -23,6 +24,9 @@ function get_member_token_key(device, token)
 {
 	return key_string = "TOKEN::"+device+"::"+token;
 }
+
+
+
 
 land = {
 
@@ -170,9 +174,18 @@ land = {
 																	messageData.token = dbData2[0].pushToken;
 																	messageData.badge_count = 1;
 																	messageData.alert_message = '회원님의 땅이 '+dbData2[0].nickname+'님에게 정복당했습니다.';
-																	messageData.payload = {'message': ''};
+																	messageData.payload = {
+																		'type': 'conquer'
+																	};
 																	
-																	push_manager.push_queue('PUSH_APNS_TASK_QUEUE', messageData);
+																	if(dbData2[0].device == 'ANDROID')
+																	{
+																		push_manager.push_queue('PUSH_GCM_TASK_QUEUE', messageData);
+																	}
+																	else
+																	{
+																		push_manager.push_queue('PUSH_APNS_TASK_QUEUE', messageData);
+																	}																	
 																}
 																
 															});
@@ -199,6 +212,56 @@ land = {
 														}
 													}
 												});
+												
+												// Cron Start
+												var CronJob = require('cron').CronJob;
+												
+												if(job != null)
+												{
+													job.stop();
+													console.log('job stop!!');	
+												}
+												
+												job = new CronJob({
+													cronTime: '* * */1 * * *',
+													onTick: function() {
+														console.log('conquer award!!');
+														
+														mysql_manager.setMemberGatheringMoney(memberIndex, 100, function(err, mysqlResult3){
+															if(err)
+															{
+																console.log('Mysql setMemberGatheringMoney() Error!!');
+															}
+														});
+													},
+													start: false,
+													timeZone: "Asia/Seouol"
+												});
+												
+												job.start();
+												
+												
+												// Cron Start
+												var CronJob2 = require('cron').CronJob;
+												
+												if(job != null)
+												{
+													job.stop();
+													console.log('job stop!!');	
+												}
+												
+												job2 = new CronJob({
+													cronTime: '00 00 05 * * */1',
+													onTick: function() {
+														console.log('conquer award reset!!');
+														job.stop();
+													},
+													start: false,
+													timeZone: "Asia/Seouol"
+												});
+												
+												job2.start();
+												
 												
 												resData.resultCode = 1;
 												resData.resultmessage = '성공';
@@ -294,29 +357,64 @@ land = {
 		
 	},
 	
-	start_test : function start_test(response, body, options) {
-		var tempValue = options.temp;
-		console.log(tempValue);
-		
-		this.timer = setInterval(function() {
-			if(tempValue)
-			{
-				console.log('world');
-			}
-			else
-			{
-				clearInterval(this.timer);
-			}			
-		}, 1000, tempValue);
-		
-	},
 	
-	end_test : function end_test(response, body, options) {
+	touch : function touch(response, body, options) {
 		
-		clearInterval(this.timer);
+		console.log('touch');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null && body.query.landIndex != null)
+		{
+			var token = body.token;
+			var uuid = body.uuid;
+			var device = body.device;
+			
+			var landIndex = body.query.landIndex;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
+				{
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
+					
+					response.json(400, resData);
+				}
+				else
+				{
+					var memberIndex = reply;
+					
+					mysql_manager.getCurrentDong(landIndex, function(err, mysqlResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 getCurrentDongList 오류';
+							
+							response.json(500, resData);
+						}
+						else
+						{
+							var dbData = JSON.parse(mysqlResult);
+							
+							resData.resultCode = 1;
+							resData.resultmessage = '성공';
+							resData.data = dbData;
+							
+							response.json(200, resData);
+						}
+					});
+				}
+			});
+		}
+		else {
+			resData.result = 11;
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
 		
 	}
-
 };
 
 module.exports = land;

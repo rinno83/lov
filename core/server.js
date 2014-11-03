@@ -4,6 +4,9 @@ var cluster = require('cluster'),
 	config = require('./configuration/index.js'),
 	bodyParser 	= require("body-parser"),
 	methodOverride = require("method-override"),
+	mysql_manager	= require('../handler/mysql_handler'),
+	push_manager	= require('../handler/push_handler'),
+	sync			= require("sync"),
 	start ;
 
 start = function start()
