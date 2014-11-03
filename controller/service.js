@@ -86,11 +86,11 @@ service = {
 		console.log('send push');
 		var resData = {};
 		
-		var memberIndex = body.memberIndex;
+		var memberIndex = (body.memberIndex)?body.memberIndex:0;
 		var title = body.title;
 		var content = body.content;
 		
-		mysql_manager.getMemberToken(memberIndex, function(err, mysqlResult){
+		mysql_manager.getMemberPushToken(memberIndex, function(err, mysqlResult){
 			if(err)
 			{
 				resData.result = 10;
@@ -101,7 +101,30 @@ service = {
 			else
 			{
 				var dbData = JSON.parse(mysqlResult);
-				push_manager.sendAPNS(dbData[0].pushToken, title, content);
+				
+				for(var i=0;i<dbData.length;i++)
+				{
+					var messageData= {};
+					var alertMessage = '';
+					
+					messageData.token = dbData[i].pushToken;
+					messageData.badge_count = 1;
+					messageData.alert_message = title;
+					messageData.payload = {
+						'type': 'notice',
+						'content': content
+					};
+
+					if(dbData[i].device == 'ANDROID')
+					{
+						push_manager.push_queue('PUSH_GCM_TASK_QUEUE', messageData);
+					}
+					else
+					{
+						push_manager.push_queue('PUSH_APNS_TASK_QUEUE', messageData);
+					}					
+											
+				}
 				
 				response.json(200, resData);
 			}

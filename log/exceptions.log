@@ -37,3 +37,4 @@
 {"level":"error","message":"config is not defined","timestamp":"2014-10-26T07:42:46.378Z"}
 {"level":"error","message":"t is not defined","timestamp":"2014-10-26T09:10:21.883Z"}
 {"level":"error","message":"t is not defined","timestamp":"2014-10-26T09:10:25.845Z"}
+{"level":"error","message":"Object #<Object> has no method 'getMemberPushToken'","timestamp":"2014-11-03T21:28:52.523Z"}

@@ -379,7 +379,7 @@ exports.getTeamInfo = function(fn){
 };
 
 
-exports.getMemberToken = function(memberIndex, fn){
+exports.getMemberPushToken = function(memberIndex, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
@@ -388,7 +388,7 @@ exports.getMemberToken = function(memberIndex, fn){
 		
 		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL USP_GET_MEMBER_TOKEN('+memberIndex+')', function(err, rows, fields) {
+			connection.query('CALL USP_GET_MEMBER_PUSHTOKEN('+memberIndex+')', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		
