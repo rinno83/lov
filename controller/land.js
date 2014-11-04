@@ -414,6 +414,90 @@ land = {
 			response.json(400, resData);
 		}
 		
+	},
+	
+	
+	
+	doInfo : function doInfo(response, body, options) {
+		
+		console.log('doInfo');
+		var resData = {};
+		
+		if(body.token != null && body.uuid != null && body.device != null)
+		{
+			var token = body.token;
+			var uuid = body.uuid;
+			var device = body.device;
+			
+			var redisKey = util.getMemberTokenKey(device, token);
+			var redisInstance = new redis_manager(config().redis);
+			redisInstance.get(redisKey, function(err, reply){
+				if(err || reply == null)
+				{
+					resData.result = 13;
+					resData.resultmessage = '회원 없음';
+					
+					response.json(400, resData);
+				}
+				else
+				{
+					var memberIndex = reply;
+					
+					mysql_manager.getDoInfo(function(err, mysqlResult){
+						if(err)
+						{
+							resData.result = 10;
+							resData.resultmessage = '서버 getDoInfo 오류';
+							
+							response.json(500, resData);
+						}
+						else
+						{
+							var dbData = JSON.parse(mysqlResult);
+							var winnerTeam = 1;
+							console.log(dbData);
+							for(var i=0;i<dbData.length;i++)
+							{
+								if(dbData[i].blueTeamCount == 0 && dbData[i].whiteTeamCount == 0)
+								{
+									dbData[i].winnerTeam = 0;
+								}
+								else
+								{
+									if(dbData[i].blueTeamCount < dbData[i].whiteTeamCount)
+									{
+										dbData[i].winnerTeam = 2;
+									}
+									else if(dbData[i].blueTeamCount > dbData[i].whiteTeamCount)
+									{
+										dbData[i].winnerTeam = 1;
+									}
+									else
+									{
+										dbData[i].winnerTeam = 3;
+									}
+								}
+								
+								
+							}
+							
+							resData.resultCode = 1;
+							resData.resultmessage = '성공';
+							resData.data = dbData;
+							
+							response.json(200, resData);
+						}
+					});
+				}
+			});
+		}
+		else {
+			resData.result = 11;
+			resData.resultmessage = '파라메터 오류';
+			
+			response.json(400, resData);
+		}
+		
 	}
 };
 

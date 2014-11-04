@@ -184,6 +184,14 @@ service = {
 											
 				}
 				
+				// Delete Member Conquer Log
+				mongodb_manager.delMemberConquerLog('conquer.log', function(err, mongoResult){
+					if(err)
+					{
+						console.log('Mysql delMemberConquerLog() Error!!');
+					}
+				});
+				
 				// Delete Member Team Info
 				mysql_manager.delMemberTeam(function(err, mysqlResult3){
 					if(err)

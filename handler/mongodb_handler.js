@@ -140,3 +140,23 @@ exports.updateMemberWalkGatheringLog = function(collection_name, memberIndex, mo
 
 
 
+
+exports.delMemberConquerLog = function(collection_name, fn) {
+	MongoClient.connect(config().mongodb.url, function(err, db) {
+		
+		db.collection(collection_name).remove(function(err, result) {
+			if(err)
+			{
+				throw err;
+			}
+			else
+			{
+				return fn(err, result);
+				db.close();
+			}			
+		});
+	});
+};
+
+
+

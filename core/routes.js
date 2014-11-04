@@ -21,6 +21,7 @@ apiRoutes = function (server) {
 	server.post('/land/conquer', controller.http(controller.land.conquer));
 	server.get('/land/current', controller.http(controller.land.current));
 	server.get('/land/touch', controller.http(controller.land.touch));
+	server.get('/land/do', controller.http(controller.land.doInfo));
 	
 	// Service
 	server.get('/service/version', controller.http(controller.service.version));

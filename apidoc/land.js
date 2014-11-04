@@ -126,3 +126,43 @@
 	*
 	*/
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//																							   //
+//									Do Info List											   //
+//																							   //
+/////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	/**
+	* @api {get} /land/do 도 단위 정보
+	* @apiName 도 단위 정보
+	* @apiGroup Land
+	*
+	*
+	* @apiSuccess {Object[]} data  Result Data.
+	* @apiSuccess {Int} data.doIndex 도 Index
+	* @apiSuccess {String} data.doName 도 이름
+	* @apiSuccess {Int} data.blueTeamCount Blue팀이 먹은 땅의 갯수
+	* @apiSuccess {Int} data.whiteTeamCount White팀이 먹은 땅의 갯수
+	* @apiSuccess {Int} data.winnerTeam 이긴 팀 Index [0:빈 땅, 1:BlueTeamWin, 2:WhiteTeamWin, 3:동점]
+	*
+	* @apiSuccessExample Success-Response:
+	*     HTTP/1.1 200 OK
+	*	{
+	*	    "resultCode": 1,
+	*	    "resultmessage": "성공",
+	*	    "data": [
+	*	        {
+	*	            "doIndex": 1,
+	*	            "doName": "강원도",
+	*	            "blueTeamCount": 2,
+	*	            "whiteTeamCount": 2,
+	*	            "winnerTeam": 3
+	*	        },
+	*	        {
+	*	            ...
+	*	        }
+	*	    ]
+	*	}	
+	*/
+
