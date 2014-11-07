@@ -214,6 +214,16 @@ service = {
 									{
 										console.log('Mysql initMemberTeam() Error!!');
 									}
+									else
+									{
+										// Init Do Info
+										mysql_manager.initDoInfo(function(err, mysqlResult4){
+											if(err)
+											{
+												console.log('Mysql initDoInfo() Error!!');
+											}
+										});
+									}
 								});
 							}
 						});

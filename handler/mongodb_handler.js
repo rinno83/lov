@@ -6,12 +6,12 @@ var config = require('../core/configuration/index.js')
 
 var MongoClient = require('mongodb').MongoClient;
 
-exports.insertMemberConquerLog = function(collection_name, memberIndex, landIndex, nextConquerMemberIndex, lat, lon) {
+exports.insertMemberConquerLog = function(collection_name, memberIndex, landIndex, nextConquerMemberIndex) {
 	MongoClient.connect(config().mongodb.url, function(err, db) {
 		
 		console.log(moment().format('X'));
 		var currentDate = moment().format('X');
-		db.collection(collection_name).insert({'memberIndex':memberIndex, 'landIndex':landIndex, 'nextConquerMemberIndex':nextConquerMemberIndex, 'lat':lat, 'lon':lon, 'registDate':currentDate}, function(err, result) {
+		db.collection(collection_name).insert({'memberIndex':memberIndex, 'landIndex':landIndex, 'nextConquerMemberIndex':nextConquerMemberIndex, 'registDate':currentDate}, function(err, result) {
 			if(err)
 			{
 				throw err;

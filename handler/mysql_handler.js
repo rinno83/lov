@@ -150,7 +150,7 @@ exports.upsertMemberFriends = function(memberIndex, friends, friendType){
 
 
 
-exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, investMoney, fn){
+exports.setMemberLandConquer = function(memberIndex, landIndex, investMoney, fn){
 	pool.getConnection(function(err, connection) {
 		if(err)
 		{
@@ -159,7 +159,7 @@ exports.setMemberLandConquer = function(memberIndex, landIndex, lat, lon, invest
 		
 		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
-			connection.query('CALL USP_SET_MEMBER_LAND_CONQUER('+memberIndex+', '+landIndex+', '+lat+', '+lon+', '+investMoney+')', function(err, rows, fields) {
+			connection.query('CALL USP_SET_MEMBER_LAND_CONQUER('+memberIndex+', '+landIndex+', '+investMoney+')', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		
@@ -474,7 +474,7 @@ exports.getTeamMemberRank = function(memberIndex, offset, limit, fn){
 			// Use the connection
 			connection.query('CALL USP_GET_TEAM_MEMBER_RANK('+memberIndex+', '+offset+', '+limit+')', function(err, rows, fields) {
 				// And done with the connection.
-				connection.release();
+				connection.release();			
 		
 			    // Don't use the connection here, it has been returned to the pool.
 			    if(err)
@@ -502,36 +502,6 @@ exports.getCurrentDongList = function(northWestLat, northWestLon, southEastLat, 
 		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_GET_CURRENT_DONG_LIST('+northWestLat+', '+northWestLon+', '+southEastLat+', '+southEastLon+')', function(err, rows, fields) {
-				// And done with the connection.
-				connection.release();
-		
-			    // Don't use the connection here, it has been returned to the pool.
-			    if(err)
-			    {
-				    throw err;
-			    }
-			    else
-			    {
-				    return fn(err, JSON.stringify(rows[0]));
-			    }
-			});
-						    
-		});
-	});
-};
-
-
-
-exports.getCurrentDong = function(landIndex, fn){
-	pool.getConnection(function(err, connection) {
-		if(err)
-		{
-			throw err;
-		}
-		
-		connection.query('USE lov_db', function(err, rows, fields){
-			// Use the connection
-			connection.query('CALL USP_GET_CURRENT_DONG('+northWestLat+', '+northWestLon+', '+southEastLat+', '+southEastLon+')', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		
@@ -712,6 +682,35 @@ exports.delMemberConquer = function(fn){
 		connection.query('USE lov_db', function(err, rows, fields){
 			// Use the connection
 			connection.query('CALL USP_DEL_MEMBER_CONQUER()', function(err, rows, fields) {
+				// And done with the connection.
+				connection.release();
+		
+			    // Don't use the connection here, it has been returned to the pool.
+			    if(err)
+			    {
+				    throw err;
+			    }
+			    else
+			    {
+				    return fn(err, JSON.stringify(rows[0]));
+			    }
+			});
+						    
+		});
+	});
+};
+
+
+exports.initDoInfo = function(fn){
+	pool.getConnection(function(err, connection) {
+		if(err)
+		{
+			throw err;
+		}
+		
+		connection.query('USE lov_db', function(err, rows, fields){
+			// Use the connection
+			connection.query('CALL USP_INIT_DO_INFO()', function(err, rows, fields) {
 				// And done with the connection.
 				connection.release();
 		

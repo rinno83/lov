@@ -35,15 +35,13 @@ land = {
 		console.log('conquer');
 		var resData = {};
 		
-		if(body.token != null && body.uuid != null && body.device != null && body.landIndex != null && body.lat != null && body.lon != null && body.investMoney != null)
+		if(body.token != null && body.uuid != null && body.device != null && body.landIndex != null && body.investMoney != null)
 		{
 			var token = body.token;
 			var uuid = body.uuid;
 			var device = body.device;
 			
 			var landIndex = body.landIndex;
-			var lat = body.lat;
-			var lon = body.lon;
 			var investMoney = parseInt(body.investMoney);
 			var battingMoney = 100;
 			
@@ -87,7 +85,7 @@ land = {
 							else
 							{
 								// 사용자 땅 정복 저장
-								mysql_manager.setMemberLandConquer(memberIndex, landIndex, lat, lon, investMoney, function(err, mysqlResult2){
+								mysql_manager.setMemberLandConquer(memberIndex, landIndex, investMoney, function(err, mysqlResult2){
 									if(err)
 									{
 										resData.resultCode = 10;				
@@ -202,13 +200,13 @@ land = {
 																}
 																else
 																{
-																	mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+																	mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0);
 																}
 															});
 														}
 														else
 														{
-															mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0, lat, lon);
+															mongodb_manager.insertMemberConquerLog('conquer.log', memberIndex, landIndex, 0);
 														}
 													}
 												});
@@ -338,64 +336,15 @@ land = {
 						{
 							var dbData = JSON.parse(mysqlResult);
 							
-							resData.resultCode = 1;
-							resData.resultmessage = '성공';
-							resData.data = dbData;
-							
-							response.json(200, resData);
-						}
-					});
-				}
-			});
-		}
-		else {
-			resData.result = 11;
-			resData.resultmessage = '파라메터 오류';
-			
-			response.json(400, resData);
-		}
-		
-	},
-	
-	
-	touch : function touch(response, body, options) {
-		
-		console.log('touch');
-		var resData = {};
-		
-		if(body.token != null && body.uuid != null && body.device != null && body.query.landIndex != null)
-		{
-			var token = body.token;
-			var uuid = body.uuid;
-			var device = body.device;
-			
-			var landIndex = body.query.landIndex;
-			
-			var redisKey = util.getMemberTokenKey(device, token);
-			var redisInstance = new redis_manager(config().redis);
-			redisInstance.get(redisKey, function(err, reply){
-				if(err || reply == null)
-				{
-					resData.result = 13;
-					resData.resultmessage = '회원 없음';
-					
-					response.json(400, resData);
-				}
-				else
-				{
-					var memberIndex = reply;
-					
-					mysql_manager.getCurrentDong(landIndex, function(err, mysqlResult){
-						if(err)
-						{
-							resData.result = 10;
-							resData.resultmessage = '서버 getCurrentDongList 오류';
-							
-							response.json(500, resData);
-						}
-						else
-						{
-							var dbData = JSON.parse(mysqlResult);
+							for(var i=0;i<dbData.length;i++)
+							{
+								dbData[i].location = ((dbData[i].do)?dbData[i].do:'') + ' ' + ((dbData[i].si)?dbData[i].si:'') + ' ' + ((dbData[i].gu)?dbData[i].gu:'') + ' ' +  ((dbData[i].dong)?dbData[i].dong:'');
+								
+								delete dbData[i].do;
+								delete dbData[i].si;
+								delete dbData[i].gu;
+								delete dbData[i].dong;
+							}
 							
 							resData.resultCode = 1;
 							resData.resultmessage = '성공';
